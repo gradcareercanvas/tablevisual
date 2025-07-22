@@ -419,7 +419,7 @@
             </div>
             <div class="config-row">
                 <label for="range">Range:</label>
-                <input type="text" id="range" value="Sheet1!A:F" placeholder="e.g., Sheet1!A:F or 'Sheet Name'!A:Z">
+                <input type="text" id="range" value="Sheet1!A:F" placeholder="e.g., Sheet1!A:F or 'Sheet Name'!A,C,D">
             </div>
             <div class="config-row">
                 <label for="excludeColumns">Exclude Columns:</label>
@@ -840,15 +840,30 @@
             processRangeWithExclusions(range, excludeColumns) {
                 if (!excludeColumns || excludeColumns.trim() === '') return range;
                 
-                // Parse the range to get sheet name and column range
-                const match = range.match(/^([^!]+)!([A-Za-z]+)(?::([A-Za-z]+))?$/);
+                // Parse the range to get sheet name and columns
+                const match = range.match(/^([^!]+)!(.+)$/);
                 if (!match) {
-                    throw new Error(`Invalid range format: ${range}. Expected format: "SheetName!A:Z" or "SheetName!A"`);
+                    throw new Error(`Invalid range format: ${range}. Expected format: "SheetName!A:Z" or "SheetName!A,C,D"`);
                 }
                 
                 const sheetName = match[1];
-                const startCol = match[2].toUpperCase();
-                const endCol = (match[3] || startCol).toUpperCase();
+                const columnsPart = match[2];
+                
+                // Check if it's already a list of columns (like A,C,D)
+                if (columnsPart.includes(',')) {
+                    // If it's already comma-separated, just return as-is
+                    return range;
+                }
+                
+                // Handle range format (like A:F)
+                const rangeMatch = columnsPart.match(/^([A-Za-z]+):([A-Za-z]+)$/);
+                if (!rangeMatch) {
+                    // If it's not a range either, treat as single column
+                    return range;
+                }
+                
+                const startCol = rangeMatch[1].toUpperCase();
+                const endCol = rangeMatch[2].toUpperCase();
                 
                 // Convert start and end columns to numbers
                 const startIndex = this.columnLetterToIndex(startCol);
