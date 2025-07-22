@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sehat Scan All Time Leaderboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f8fafc;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            padding: 24px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: bold;
+            color: #1f2937;
+        }
+
+        .controls {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background-color: #3b82f6;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #2563eb;
+        }
+
+        .btn-secondary {
+            background-color: #6b7280;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: #4b5563;
+        }
+
+        .btn-success {
+            background-color: #10b981;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background-color: #059669;
+        }
+
+        .google-sheets-config {
+            background-color: #f3f4f6;
+            padding: 16px;
+            border-radius: 6px;
+            margin-bottom: 16px;
+            border: 1px solid #d1d5db;
+        }
+
+        .config-row {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .config-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .config-row label {
+            font-weight: 500;
+            min-width: 120px;
+            color: #374151;
+        }
+
+        .config-row input {
+            flex: 1;
+            min-width: 200px;
+            padding: 8px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .config-row input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .status {
+            padding: 12px 16px;
+            border-radius: 6px;
+            margin-bottom: 16px;
+            font-size: 14px;
+            display: none;
+        }
+
+        .status.success {
+            background-color: #dcfce7;
+            color: #166534;
+            border: 1px solid #bbf7d0;
+        }
+
+        .status.error {
+            background-color: #fef2f2;
+            color: #dc2626;
+            border: 1px solid #fecaca;
+        }
+
+        .status.info {
+            background-color: #eff6ff;
+            color: #1d4ed8;
+            border: 1px solid #bfdbfe;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        thead {
+            background-color: #f9fafb;
+        }
+
+        th {
+            padding: 12px 16px;
+            text-align: left;
+            font-size: 11px;
+            font-weight: 500;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-right: 1px solid #e5e7eb;
+            position: relative;
+        }
+
+        th:last-child {
+            border-right: none;
+        }
+
+        .th-center {
+            text-align: center;
+        }
+
+        .th-right {
+            text-align: right;
+        }
+
+        tbody tr {
+            transition: background-color 0.2s;
+        }
+
+        tbody tr:hover {
+            background-color: #f9fafb;
+        }
+
+        td {
+            padding: 12px 16px;
+            font-size: 14px;
+            border-right: 1px solid #e5e7eb;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        td:last-child {
+            border-right: none;
+        }
+
+        .td-center {
+            text-align: center;
+        }
+
+        .td-right {
+            text-align: right;
+        }
+
+        .name-cell {
+            font-weight: 500;
+            color: #1f2937;
+        }
+
+        .blackout {
+            background-color: #000;
+            color: #000;
+            user-select: none;
+            border-radius: 2px;
+        }
+
+        .subscription-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            font-size: 12px;
+            font-weight: bold;
+            color: white;
+        }
+
+        .active-subscription {
+            background-color: #10b981;
+        }
+
+        .inactive-subscription {
+            background-color: #ef4444;
+        }
+
+        .bp-normal {
+            background-color: #dcfce7;
+        }
+
+        .bp-elevated {
+            background-color: #fef3c7;
+        }
+
+        .bp-high {
+            background-color: #fee2e2;
+        }
+
+        .edit-mode-info {
+            background-color: #eff6ff;
+            border: 1px solid #bfdbfe;
+            color: #1e40af;
+            padding: 16px;
+            border-radius: 6px;
+            margin-top: 16px;
+            display: none;
+        }
+
+        .edit-mode-info.show {
+            display: block;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #6b7280;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #3b82f6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 8px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .controls {
+                justify-content: center;
+            }
+
+            .config-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .config-row label {
+                min-width: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Sehat Scan All Time Leaderboard</h1>
+            <div class="controls">
+                <button id="toggleConfig" class="btn btn-secondary">⚙️ Configure API</button>
+                <button id="refreshData" class="btn btn-success">🔄 Refresh Data</button>
+                <button id="toggleNames" class="btn btn-secondary" style="display: none;">👁️ Hide Names</button>
+                <button id="toggleEdit" class="btn btn-primary">✏️ Edit Mode</button>
+            </div>
+        </div>
+
+        <div id="googleSheetsConfig" class="google-sheets-config" style="display: none;">
+            <h3 style="margin-bottom: 12px; color: #374151;">Google Sheets Configuration</h3>
+            <div class="config-row">
+                <label for="apiKey">API Key:</label>
+                <input type="text" id="apiKey" placeholder="Your Google Sheets API Key">
+            </div>
+            <div class="config-row">
+                <label for="spreadsheetId">Spreadsheet ID:</label>
+                <input type="text" id="spreadsheetId" placeholder="Google Sheets ID from URL">
+            </div>
+            <div class="config-row">
+                <label for="range">Range:</label>
+                <input type="text" id="range" value="Sheet1!A:F" placeholder="e.g., Sheet1!A:F">
+            </div>
+            <div class="config-row">
+                <button id="saveConfig" class="btn btn-primary">💾 Save Configuration</button>
+                <button id="testConnection" class="btn btn-secondary">🔌 Test Connection</button>
+            </div>
+            <div style="margin-top: 12px; font-size: 12px; color: #6b7280;">
+                <strong>Setup Instructions:</strong><br>
+                1. Go to <a href="https://console.developers.google.com/" target="_blank">Google Cloud Console</a><br>
+                2. Create a project and enable Google Sheets API<br>
+                3. Create credentials (API Key)<br>
+                4. Make your Google Sheet public (Share → Anyone with the link can view)
+            </div>
+        </div>
+
+        <div id="statusMessage" class="status"></div>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Name ▲</th>
+                        <th>Last Scan Date</th>
+                        <th class="th-center">Is Active Subscription ●</th>
+                        <th class="th-right">Avg Diastolic</th>
+                        <th class="th-right">Avg Systolic</th>
+                        <th class="th-right">Scan Count</th>
+                    </tr>
+                </thead>
+                <tbody id="dataTable">
+                    <tr>
+                        <td colspan="6" class="loading">
+                            <div class="spinner"></div>
+                            Loading data... Click "Configure API" to set up Google Sheets connection.
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div id="editModeInfo" class="edit-mode-info">
+            <strong>✏️ Edit Mode Active</strong><br>
+            Use the "Hide Names" button to blackout sensitive information in the name column.
+        </div>
+    </div>
+
+    <script>
+        class SehatScanLeaderboard {
+            constructor() {
+                this.editMode = false;
+                this.namesHidden = false;
+                this.apiKey = localStorage.getItem('googleSheetsApiKey') || '';
+                this.spreadsheetId = localStorage.getItem('googleSpreadsheetId') || '';
+                this.range = localStorage.getItem('googleSheetsRange') || 'Sheet1!A:F';
+                this.data = [];
+                
+                this.initializeApp();
+            }
+
+            initializeApp() {
+                this.loadSavedConfig();
+                this.bindEvents();
+                this.loadSampleData();
+            }
+
+            loadSavedConfig() {
+                document.getElementById('apiKey').value = this.apiKey;
+                document.getElementById('spreadsheetId').value = this.spreadsheetId;
+                document.getElementById('range').value = this.range;
+            }
+
+            bindEvents() {
+                document.getElementById('toggleConfig').addEventListener('click', () => {
+                    this.toggleConfiguration();
+                });
+
+                document.getElementById('saveConfig').addEventListener('click', () => {
+                    this.saveConfiguration();
+                });
+
+                document.getElementById('testConnection').addEventListener('click', () => {
+                    this.testConnection();
+                });
+
+                document.getElementById('refreshData').addEventListener('click', () => {
+                    this.refreshData();
+                });
+
+                document.getElementById('toggleEdit').addEventListener('click', () => {
+                    this.toggleEditMode();
+                });
+
+                document.getElementById('toggleNames').addEventListener('click', () => {
+                    this.toggleNames();
+                });
+            }
+
+            toggleConfiguration() {
+                const config = document.getElementById('googleSheetsConfig');
+                const isVisible = config.style.display !== 'none';
+                config.style.display = isVisible ? 'none' : 'block';
+            }
+
+            saveConfiguration() {
+                this.apiKey = document.getElementById('apiKey').value.trim();
+                this.spreadsheetId = document.getElementById('spreadsheetId').value.trim();
+                this.range = document.getElementById('range').value.trim() || 'Sheet1!A:F';
+
+                localStorage.setItem('googleSheetsApiKey', this.apiKey);
+                localStorage.setItem('googleSpreadsheetId', this.spreadsheetId);
+                localStorage.setItem('googleSheetsRange', this.range);
+
+                this.showStatus('Configuration saved successfully!', 'success');
+                document.getElementById('googleSheetsConfig').style.display = 'none';
+            }
+
+            async testConnection() {
+                if (!this.apiKey || !this.spreadsheetId) {
+                    this.showStatus('Please provide API Key and Spreadsheet ID', 'error');
+                    return;
+                }
+
+                this.showStatus('Testing connection...', 'info');
+                
+                try {
+                    const url = `https://sheets.googleapis.com/v4/spreadsheets/${this.spreadsheetId}/values/${this.range}?key=${this.apiKey}`;
+                    const response = await fetch(url);
+                    
+                    if (response.ok) {
+                        const data = await response.json();
+                        this.showStatus(`Connection successful! Found ${data.values ? data.values.length : 0} rows.`, 'success');
+                    } else {
+                        const error = await response.json();
+                        this.showStatus(`Connection failed: ${error.error?.message || 'Unknown error'}`, 'error');
+                    }
+                } catch (error) {
+                    this.showStatus(`Connection failed: ${error.message}`, 'error');
+                }
+            }
+
+            async refreshData() {
+                if (!this.apiKey || !this.spreadsheetId) {
+                    this.showStatus('Please configure Google Sheets API first', 'error');
+                    document.getElementById('googleSheetsConfig').style.display = 'block';
+                    return;
+                }
+
+                this.showStatus('Loading data from Google Sheets...', 'info');
+                this.showLoading();
+
+                try {
+                    const url = `https://sheets.googleapis.com/v4/spreadsheets/${this.spreadsheetId}/values/${this.range}?key=${this.apiKey}`;
+                    const response = await fetch(url);
+                    
+                    if (!response.ok) {
+                        const error = await response.json();
+                        throw new Error(error.error?.message || 'Failed to fetch data');
+                    }
+
+                    const result = await response.json();
+                    const rows = result.values || [];
+
+                    if (rows.length < 2) {
+                        throw new Error('No data found or insufficient data');
+                    }
+
+                    // Skip header row and process data
+                    this.data = rows.slice(1).map(row => ({
+                        name: row[0] || '',
+                        last_scan_date: row[1] || '',
+                        is_active_subscription: parseInt(row[2]) || 0,
+                        avg_diastolic: parseFloat(row[3]) || 0,
+                        avg_systolic: parseFloat(row[4]) || 0,
+                        scan_count: parseInt(row[5]) || 0
+                    }));
+
+                    this.renderTable();
+                    this.showStatus(`Successfully loaded ${this.data.length} records`, 'success');
+
+                } catch (error) {
+                    this.showStatus(`Error loading data: ${error.message}`, 'error');
+                    this.loadSampleData();
+                }
+            }
+
+            loadSampleData() {
+                this.data = [
+                    { name: "Abbas", last_scan_date: "45337.50158", is_active_subscription: 0, avg_diastolic: 68.78, avg_systolic: 111.57, scan_count: 1503 },
+                    { name: "Abd Mahmood Saleemi", last_scan_date: "31/01/25 20:31", is_active_subscription: 1, avg_diastolic: 84.18, avg_systolic: 121.41, scan_count: 168 },
+                    { name: "Adeel", last_scan_date: "27/05/24 13:53", is_active_subscription: 0, avg_diastolic: 82.26, avg_systolic: 122.85, scan_count: 420 },
+                    { name: "Aijaz Ahme", last_scan_date: "13/09/23 02:23", is_active_subscription: 0, avg_diastolic: 67.65, avg_systolic: 108.59, scan_count: 111 },
+                    { name: "Anwar khurshid", last_scan_date: "45955.57917", is_active_subscription: 0, avg_diastolic: 69.29, avg_systolic: 116.84, scan_count: 5468 },
+                    { name: "Arfan Arif", last_scan_date: "27/03/25 18:15", is_active_subscription: 0, avg_diastolic: 71.07, avg_systolic: 110.42, scan_count: 132 },
+                    { name: "Arsalan Ahmed", last_scan_date: "20/04/25 10:28", is_active_subscription: 1, avg_diastolic: 82.37, avg_systolic: 120.01, scan_count: 520 },
+                    { name: "Ayesha", last_scan_date: "45036.00903", is_active_subscription: 0, avg_diastolic: 72.12, avg_systolic: 113.25, scan_count: 210 },
+                    { name: "BA FDPP", last_scan_date: "45638.725", is_active_subscription: 1, avg_diastolic: 79.67, avg_systolic: 104.91, scan_count: 128 },
+                    { name: "FB area branch", last_scan_date: "45450.56567", is_active_subscription: 1, avg_diastolic: 83, avg_systolic: 120.18, scan_count: 152 }
+                ];
+                this.renderTable();
+            }
+
+            showLoading() {
+                document.getElementById('dataTable').innerHTML = `
+                    <tr>
+                        <td colspan="6" class="loading">
+                            <div class="spinner"></div>
+                            Loading data from Google Sheets...
+                        </td>
+                    </tr>
+                `;
+            }
+
+            getBloodPressureClass(systolic, diastolic) {
+                if (systolic >= 140 || diastolic >= 90) return 'bp-high';
+                if (systolic >= 130 || diastolic >= 80) return 'bp-elevated';
+                if (systolic >= 120 || diastolic >= 80) return 'bp-elevated';
+                return 'bp-normal';
+            }
+
+            renderTable() {
+                const tbody = document.getElementById('dataTable');
+                
+                if (!this.data.length) {
+                    tbody.innerHTML = '<tr><td colspan="6" class="loading">No data available</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = this.data.map(row => {
+                    const bpClass = this.getBloodPressureClass(row.avg_systolic, row.avg_diastolic);
+                    const nameDisplay = (this.editMode && this.namesHidden) ? 
+                        '█'.repeat(row.name.length) : row.name;
+                    const nameClass = (this.editMode && this.namesHidden) ? 'blackout' : '';
+
+                    return `
+                        <tr>
+                            <td class="name-cell ${nameClass}">${nameDisplay}</td>
+                            <td>${row.last_scan_date}</td>
+                            <td class="td-center">
+                                <span class="subscription-badge ${row.is_active_subscription ? 'active-subscription' : 'inactive-subscription'}">
+                                    ${row.is_active_subscription}
+                                </span>
+                            </td>
+                            <td class="td-right ${bpClass}">${row.avg_diastolic}</td>
+                            <td class="td-right ${bpClass}">${row.avg_systolic}</td>
+                            <td class="td-right">${row.scan_count.toLocaleString()}</td>
+                        </tr>
+                    `;
+                }).join('');
+            }
+
+            toggleEditMode() {
+                this.editMode = !this.editMode;
+                const toggleBtn = document.getElementById('toggleEdit');
+                const toggleNamesBtn = document.getElementById('toggleNames');
+                const editInfo = document.getElementById('editModeInfo');
+
+                if (this.editMode) {
+                    toggleBtn.textContent = '❌ Exit Edit';
+                    toggleNamesBtn.style.display = 'block';
+                    editInfo.classList.add('show');
+                } else {
+                    toggleBtn.textContent = '✏️ Edit Mode';
+                    toggleNamesBtn.style.display = 'none';
+                    editInfo.classList.remove('show');
+                    this.namesHidden = false;
+                    toggleNamesBtn.textContent = '👁️ Hide Names';
+                }
+
+                this.renderTable();
+            }
+
+            toggleNames() {
+                this.namesHidden = !this.namesHidden;
+                const toggleNamesBtn = document.getElementById('toggleNames');
+                toggleNamesBtn.textContent = this.namesHidden ? '👀 Show Names' : '👁️ Hide Names';
+                this.renderTable();
+            }
+
+            showStatus(message, type) {
+                const statusEl = document.getElementById('statusMessage');
+                statusEl.textContent = message;
+                statusEl.className = `status ${type}`;
+                statusEl.style.display = 'block';
+
+                setTimeout(() => {
+                    statusEl.style.display = 'none';
+                }, 5000);
+            }
+        }
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', () => {
+            new SehatScanLeaderboard();
+        });
+    </script>
+</body>
+</html>
