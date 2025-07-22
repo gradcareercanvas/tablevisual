@@ -402,7 +402,6 @@
             <div class="controls">
                 <button id="toggleConfig" class="btn btn-secondary">⚙️ Configure API</button>
                 <button id="refreshData" class="btn btn-success">🔄 Refresh Data</button>
-                <button id="loadSample" class="btn btn-secondary">📊 Load Sample</button>
                 <button id="toggleNames" class="btn btn-secondary" style="display: none;">👁️ Hide Names</button>
                 <button id="toggleEdit" class="btn btn-primary">✏️ Edit Mode</button>
             </div>
@@ -420,7 +419,7 @@
             </div>
             <div class="config-row">
                 <label for="range">Range:</label>
-                <input type="text" id="range" value="Sheet1!A:F" placeholder="e.g., Sheet1!A:F">
+                <input type="text" id="range" value="Sheet1!A:F" placeholder="e.g., Sheet1!A:F or 'Sheet Name'!A:Z">
             </div>
             <div class="config-row">
                 <label for="excludeColumns">Exclude Columns:</label>
@@ -558,7 +557,7 @@
                     <tr>
                         <td colspan="6" class="loading">
                             <div class="spinner"></div>
-                            Loading data... Click "Configure API" to set up Google Sheets connection or "Load Sample" to see demo data.
+                            Loading data... Click "Configure API" to set up Google Sheets connection.
                         </td>
                     </tr>
                 </tbody>
@@ -659,7 +658,6 @@
                     { id: 'saveConfig', handler: () => this.saveConfiguration() },
                     { id: 'testConnection', handler: () => this.testConnection() },
                     { id: 'refreshData', handler: () => this.refreshData() },
-                    { id: 'loadSample', handler: () => this.loadSampleData() },
                     { id: 'toggleEdit', handler: () => this.requestPassword('edit') },
                     { id: 'toggleNames', handler: () => this.toggleNames() },
                     { id: 'toggleColumnMapping', handler: () => this.toggleColumnMapping() },
@@ -816,59 +814,72 @@
                 
                 try {
                     // Process the range to exclude columns
-                    const processedRange = this.processRangeWithExclusions(this.range, this.excludeColumns);
+                    let processedRange;
+                    try {
+                        processedRange = this.processRangeWithExclusions(this.range, this.excludeColumns);
+                    } catch (rangeError) {
+                        this.showStatus(`Invalid range format: ${rangeError.message}`, 'error');
+                        return;
+                    }
                     
-                    const url = `https://sheets.googleapis.com/v4/spreadsheets/${this.spreadsheetId}/values/${processedRange}?key=${this.apiKey}`;
+                    const url = `https://sheets.googleapis.com/v4/spreadsheets/${this.spreadsheetId}/values/${encodeURIComponent(processedRange)}?key=${this.apiKey}`;
                     const response = await fetch(url);
                     
                     if (response.ok) {
                         const data = await response.json();
                         this.showStatus(`Connection successful! Found ${data.values ? data.values.length : 0} rows.`, 'success');
                     } else {
-                        const error = await response.json();
+                        const error = await response.json().catch(() => ({ error: { message: 'Unknown error' } }));
                         this.showStatus(`Connection failed: ${error.error?.message || 'Unknown error'}`, 'error');
                     }
                 } catch (error) {
                     this.showStatus(`Connection failed: ${error.message}`, 'error');
                 }
             }
+
             processRangeWithExclusions(range, excludeColumns) {
-                if (!excludeColumns) return range;
+                if (!excludeColumns || excludeColumns.trim() === '') return range;
+                
                 // Parse the range to get sheet name and column range
                 const match = range.match(/^([^!]+)!([A-Za-z]+)(?::([A-Za-z]+))?$/);
-                if (!match) return range;
+                if (!match) {
+                    throw new Error(`Invalid range format: ${range}. Expected format: "SheetName!A:Z" or "SheetName!A"`);
+                }
+                
                 const sheetName = match[1];
-                const startCol = match[2];
-                const endCol = match[3] || startCol; // If no end column, use start column
-    // Convert start and end columns to numbers
+                const startCol = match[2].toUpperCase();
+                const endCol = (match[3] || startCol).toUpperCase();
+                
+                // Convert start and end columns to numbers
                 const startIndex = this.columnLetterToIndex(startCol);
                 const endIndex = this.columnLetterToIndex(endCol);
-    
-    // Parse excluded columns
+                
+                // Parse excluded columns
                 const excludedIndices = excludeColumns.split(',')
                     .map(col => col.trim().toUpperCase())
                     .filter(col => col)
                     .map(col => this.columnLetterToIndex(col));
-    
-    // Generate the new range
+                
+                // Generate the new range
                 let includedColumns = [];
                 for (let i = startIndex; i <= endIndex; i++) {
                     if (!excludedIndices.includes(i)) {
                         includedColumns.push(this.indexToColumnLetter(i));
                     }
                 }
+                
                 if (includedColumns.length === 0) {
-                    this.showStatus('Error: All columns were excluded', 'error');
-                    return range; // Fallback to original range if all columns are excluded
+                    throw new Error('All columns were excluded');
                 }
-    
-    // If the included columns are contiguous, return a range (A:C), otherwise return individual columns (A,C,D)
+                
+                // If the included columns are contiguous, return a range (A:C), otherwise return individual columns (A,C,D)
                 if (this.isContiguous(includedColumns)) {
                     return `${sheetName}!${includedColumns[0]}:${includedColumns[includedColumns.length-1]}`;
                 } else {
                     return `${sheetName}!${includedColumns.join(',')}`;
                 }
             }
+
             isContiguous(columns) {
                 for (let i = 1; i < columns.length; i++) {
                     const prevIndex = this.columnLetterToIndex(columns[i-1]);
@@ -893,13 +904,20 @@
 
                 try {
                     // Process the range to exclude columns
-                    const processedRange = this.processRangeWithExclusions(this.range, this.excludeColumns);
-                    
-                    const url = `https://sheets.googleapis.com/v4/spreadsheets/${this.spreadsheetId}/values/${processedRange}?key=${this.apiKey}`;
+                    let processedRange;
+                    try {
+                        processedRange = this.processRangeWithExclusions(this.range, this.excludeColumns);
+                    } catch (rangeError) {
+                        this.showStatus(`Invalid range format: ${rangeError.message}`, 'error');
+                        this.showError(`Invalid range format. Please check your range (${this.range}) and excluded columns (${this.excludeColumns})`);
+                        return;
+                    }
+
+                    const url = `https://sheets.googleapis.com/v4/spreadsheets/${this.spreadsheetId}/values/${encodeURIComponent(processedRange)}?key=${this.apiKey}`;
                     const response = await fetch(url);
                     
                     if (!response.ok) {
-                        const error = await response.json();
+                        const error = await response.json().catch(() => ({ error: { message: 'Unknown error' } }));
                         throw new Error(error.error?.message || 'Failed to fetch data');
                     }
 
@@ -907,43 +925,44 @@
                     const rows = result.values || [];
 
                     if (rows.length < 2) {
-                        throw new Error('No data found or insufficient data');
+                        throw new Error('No data found or insufficient data (need at least 1 header row and 1 data row)');
                     }
 
-                    // Skip header row and process data using column mapping
-                    this.data = rows.slice(1).map(row => ({
-                        name: row[this.columnLetterToIndex(this.columnMapping.name)] || '',
-                        last_scan_date: row[this.columnLetterToIndex(this.columnMapping.date)] || '',
-                        is_active_subscription: parseInt(row[this.columnLetterToIndex(this.columnMapping.subscription)]) || 0,
-                        avg_diastolic: parseFloat(row[this.columnLetterToIndex(this.columnMapping.diastolic)]) || 0,
-                        avg_systolic: parseFloat(row[this.columnLetterToIndex(this.columnMapping.systolic)]) || 0,
-                        scan_count: parseInt(row[this.columnLetterToIndex(this.columnMapping.scanCount)]) || 0
-                    }));
+                    // Process data using column mapping
+                    try {
+                        this.data = rows.slice(1).map(row => ({
+                            name: row[this.columnLetterToIndex(this.columnMapping.name)] || '',
+                            last_scan_date: row[this.columnLetterToIndex(this.columnMapping.date)] || '',
+                            is_active_subscription: parseInt(row[this.columnLetterToIndex(this.columnMapping.subscription)]) || 0,
+                            avg_diastolic: parseFloat(row[this.columnLetterToIndex(this.columnMapping.diastolic)]) || 0,
+                            avg_systolic: parseFloat(row[this.columnLetterToIndex(this.columnMapping.systolic)]) || 0,
+                            scan_count: parseInt(row[this.columnLetterToIndex(this.columnMapping.scanCount)]) || 0
+                        }));
 
-                    this.renderTable();
-                    this.showStatus(`Successfully loaded ${this.data.length} records`, 'success');
+                        if (this.data.length === 0) {
+                            throw new Error('Data loaded but no valid records found. Check your column mapping.');
+                        }
+
+                        this.renderTable();
+                        this.showStatus(`Successfully loaded ${this.data.length} records`, 'success');
+
+                    } catch (mappingError) {
+                        throw new Error(`Data mapping failed: ${mappingError.message}. Check your column configuration.`);
+                    }
 
                 } catch (error) {
+                    console.error('Data loading error:', error);
                     this.showStatus(`Error loading data: ${error.message}`, 'error');
-                    this.showError('Failed to load data from Google Sheets. Please check your configuration.');
+                    this.showError(`Failed to load data: ${error.message}<br><br>
+                        Please check:<br>
+                        1. Your API key and spreadsheet ID<br>
+                        2. The sheet name and range are correct<br>
+                        3. Your column mapping matches your sheet structure`);
+                    
+                    // Show configuration panel to help user fix the issue
+                    const config = document.getElementById('googleSheetsConfig');
+                    if (config) config.style.display = 'block';
                 }
-            }
-
-            loadSampleData() {
-                this.data = [
-                    { name: "Abbas", last_scan_date: "45337.50158", is_active_subscription: 0, avg_diastolic: 68.78, avg_systolic: 111.57, scan_count: 1503 },
-                    { name: "Abd Mahmood Saleemi", last_scan_date: "31/01/25 20:31", is_active_subscription: 1, avg_diastolic: 84.18, avg_systolic: 121.41, scan_count: 168 },
-                    { name: "Adeel", last_scan_date: "27/05/24 13:53", is_active_subscription: 0, avg_diastolic: 82.26, avg_systolic: 122.85, scan_count: 420 },
-                    { name: "Aijaz Ahme", last_scan_date: "13/09/23 02:23", is_active_subscription: 0, avg_diastolic: 67.65, avg_systolic: 108.59, scan_count: 111 },
-                    { name: "Anwar khurshid", last_scan_date: "45955.57917", is_active_subscription: 0, avg_diastolic: 69.29, avg_systolic: 116.84, scan_count: 5468 },
-                    { name: "Arfan Arif", last_scan_date: "27/03/25 18:15", is_active_subscription: 0, avg_diastolic: 71.07, avg_systolic: 110.42, scan_count: 132 },
-                    { name: "Arsalan Ahmed", last_scan_date: "20/04/25 10:28", is_active_subscription: 1, avg_diastolic: 82.37, avg_systolic: 120.01, scan_count: 520 },
-                    { name: "Ayesha", last_scan_date: "45036.00903", is_active_subscription: 0, avg_diastolic: 72.12, avg_systolic: 113.25, scan_count: 210 },
-                    { name: "BA FDPP", last_scan_date: "45638.725", is_active_subscription: 1, avg_diastolic: 79.67, avg_systolic: 104.91, scan_count: 128 },
-                    { name: "FB area branch", last_scan_date: "45450.56567", is_active_subscription: 1, avg_diastolic: 83, avg_systolic: 120.18, scan_count: 152 }
-                ];
-                this.renderTable();
-                this.showStatus('Sample data loaded successfully', 'success');
             }
 
             showLoading() {
@@ -965,14 +984,23 @@
                 if (tbody) {
                     tbody.innerHTML = `
                         <tr>
-                            <td colspan="6" class="loading" style="color: #dc2626;">
-                                ❌ ${message}<br>
-                                <small style="color: #6b7280; margin-top: 8px; display: block;">
-                                    Use "Configure API" to set up your Google Sheets connection, or contact support if the issue persists.
-                                </small>
+                            <td colspan="6" class="loading" style="color: #dc2626; text-align: left;">
+                                ❌ ${message}<br><br>
+                                <button id="showConfigFromError" class="btn btn-secondary" style="margin-top: 10px;">
+                                    ⚙️ Open Configuration
+                                </button>
                             </td>
                         </tr>
                     `;
+                    
+                    // Add event listener to the new button
+                    const showConfigBtn = document.getElementById('showConfigFromError');
+                    if (showConfigBtn) {
+                        showConfigBtn.addEventListener('click', () => {
+                            const config = document.getElementById('googleSheetsConfig');
+                            if (config) config.style.display = 'block';
+                        });
+                    }
                 }
             }
 
