@@ -977,42 +977,6 @@
                     tbody.innerHTML = `
                         <tr>
                             <td colspan="6" class="loading">
-                                <div class="spinner"></div>
-                                Loading data from Google Sheets...
-                            </td>
-                        </tr>
-                    `;
-                }
-            }
-
-            showError(message) {
-                const tbody = document.getElementById('dataTable');
-                if (tbody) {
-                    tbody.innerHTML = `
-                        <tr>
-                            <td colspan="6" class="loading" style="color: #dc2626;">
-                                ❌ ${message}<br>
-                                <small style="color: #6b7280; margin-top: 8px; display: block;">
-                                    Use "Configure API" to set up your Google Sheets connection, or contact support if the issue persists.
-                                </small>
-                            </td>
-                        </tr>
-                    `;
-                }
-            }
-
-            columnLetterToIndex(letter) {
-                return letter.charCodeAt(0) - 'A'.charCodeAt(0);
-            }
-
-            renderTable() {
-                const tbody = document.getElementById('dataTable');
-                if (!tbody) return;
-
-                if (!this.data || this.data.length === 0) {
-                    tbody.innerHTML = `
-                        <tr>
-                            <td colspan="6" class="loading">
                                 No data available. Please load data or check your configuration.
                             </td>
                         </tr>
@@ -1037,9 +1001,9 @@
                     // Determine BP status
                     const bpStatus = this.getBPStatus(row.avg_systolic, row.avg_diastolic);
 
-                    // Format name (handle blackout in edit mode)
+                    // Format name (handle blackout based on namesHidden state)
                     let nameDisplay = row.name;
-                    if (this.editMode && this.namesHidden) {
+                    if (this.namesHidden) {
                         nameDisplay = `<span class="blackout">${row.name}</span>`;
                     }
 
@@ -1113,7 +1077,6 @@
                     editButton.textContent = '✏️ Edit Mode';
                     editButton.className = 'btn btn-primary';
                     namesButton.style.display = 'none';
-                    this.namesHidden = false;
                     editInfo.classList.remove('show');
                 }
 
@@ -1122,6 +1085,8 @@
 
             toggleNames() {
                 this.namesHidden = !this.namesHidden;
+                this.setStorageItem('namesHidden', this.namesHidden.toString());
+                
                 const namesButton = document.getElementById('toggleNames');
                 
                 if (this.namesHidden) {
