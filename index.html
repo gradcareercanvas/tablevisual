@@ -832,37 +832,52 @@
                     this.showStatus(`Connection failed: ${error.message}`, 'error');
                 }
             }
-
             processRangeWithExclusions(range, excludeColumns) {
                 if (!excludeColumns) return range;
-                
                 // Parse the range to get sheet name and column range
-                const match = range.match(/^([^!]+)!([A-Z]+):([A-Z]+)$/);
+                const match = range.match(/^([^!]+)!([A-Za-z]+)(?::([A-Za-z]+))?$/);
                 if (!match) return range;
-                
                 const sheetName = match[1];
                 const startCol = match[2];
-                const endCol = match[3];
-                
-                // Convert start and end columns to numbers
+                const endCol = match[3] || startCol; // If no end column, use start column
+    // Convert start and end columns to numbers
                 const startIndex = this.columnLetterToIndex(startCol);
                 const endIndex = this.columnLetterToIndex(endCol);
-                
-                // Parse excluded columns
+    
+    // Parse excluded columns
                 const excludedIndices = excludeColumns.split(',')
                     .map(col => col.trim().toUpperCase())
                     .filter(col => col)
                     .map(col => this.columnLetterToIndex(col));
-                
-                // Generate the new range
-                let newRange = [];
+    
+    // Generate the new range
+                let includedColumns = [];
                 for (let i = startIndex; i <= endIndex; i++) {
                     if (!excludedIndices.includes(i)) {
-                        newRange.push(this.indexToColumnLetter(i));
+                        includedColumns.push(this.indexToColumnLetter(i));
                     }
                 }
-                
-                return `${sheetName}!${newRange.join(',')}`;
+                if (includedColumns.length === 0) {
+                    this.showStatus('Error: All columns were excluded', 'error');
+                    return range; // Fallback to original range if all columns are excluded
+                }
+    
+    // If the included columns are contiguous, return a range (A:C), otherwise return individual columns (A,C,D)
+                if (this.isContiguous(includedColumns)) {
+                    return `${sheetName}!${includedColumns[0]}:${includedColumns[includedColumns.length-1]}`;
+                } else {
+                    return `${sheetName}!${includedColumns.join(',')}`;
+                }
+            }
+            isContiguous(columns) {
+                for (let i = 1; i < columns.length; i++) {
+                    const prevIndex = this.columnLetterToIndex(columns[i-1]);
+                    const currIndex = this.columnLetterToIndex(columns[i]);
+                    if (currIndex !== prevIndex + 1) {
+                        return false;
+                    }
+                }
+                return true;
             }
 
             async refreshData() {
