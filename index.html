@@ -313,6 +313,62 @@
             margin-right: 8px;
         }
 
+        .password-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .password-modal-content {
+            background-color: white;
+            padding: 24px;
+            border-radius: 8px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .password-modal h3 {
+            margin-bottom: 16px;
+            color: #1f2937;
+        }
+
+        .password-modal input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 16px;
+            border: 1px solid #d1d5db;
+            border-radius: 4px;
+        }
+
+        .password-modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+        }
+
+        .excluded-columns {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .excluded-columns label {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
@@ -356,7 +412,7 @@
             <h3 style="margin-bottom: 12px; color: #374151;">Google Sheets Configuration</h3>
             <div class="config-row">
                 <label for="apiKey">API Key:</label>
-                <input type="text" id="apiKey" placeholder="Your Google Sheets API Key">
+                <input type="password" id="apiKey" placeholder="Your Google Sheets API Key">
             </div>
             <div class="config-row">
                 <label for="spreadsheetId">Spreadsheet ID:</label>
@@ -365,6 +421,13 @@
             <div class="config-row">
                 <label for="range">Range:</label>
                 <input type="text" id="range" value="Sheet1!A:F" placeholder="e.g., Sheet1!A:F">
+            </div>
+            <div class="config-row">
+                <label for="excludeColumns">Exclude Columns:</label>
+                <div style="flex: 1;">
+                    <input type="text" id="excludeColumns" placeholder="e.g., B,G to exclude columns B and G">
+                    <div class="excluded-columns" id="excludedColumnsList"></div>
+                </div>
             </div>
             <div class="config-row">
                 <label for="columnMapping">Column Mapping:</label>
@@ -508,16 +571,31 @@
         </div>
     </div>
 
+    <!-- Password Modal -->
+    <div id="passwordModal" class="password-modal">
+        <div class="password-modal-content">
+            <h3>Enter Password</h3>
+            <input type="password" id="passwordInput" placeholder="Enter password">
+            <div class="password-modal-actions">
+                <button id="cancelPassword" class="btn btn-secondary">Cancel</button>
+                <button id="submitPassword" class="btn btn-primary">Submit</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         class SehatScanLeaderboard {
             constructor() {
                 this.editMode = false;
-                this.namesHidden = false;
+                this.namesHidden = this.getStorageItem('namesHidden', 'false') === 'true';
                 this.apiKey = this.getStorageItem('googleSheetsApiKey', '');
                 this.spreadsheetId = this.getStorageItem('googleSpreadsheetId', '');
                 this.range = this.getStorageItem('googleSheetsRange', 'Sheet1!A:J');
+                this.excludeColumns = this.getStorageItem('excludeColumns', '');
                 this.columnMapping = JSON.parse(this.getStorageItem('columnMapping', '{"name":"A","date":"B","subscription":"C","diastolic":"D","systolic":"E","scanCount":"F"}'));
                 this.data = [];
+                this.password = "admin123"; // Default password - change this in production
+                this.actionAfterAuth = null;
                 
                 this.initializeApp();
             }
@@ -543,6 +621,7 @@
             initializeApp() {
                 this.loadSavedConfig();
                 this.bindEvents();
+                this.updateExcludedColumnsDisplay();
             }
 
             loadSavedConfig() {
@@ -550,6 +629,7 @@
                     apiKey: document.getElementById('apiKey'),
                     spreadsheetId: document.getElementById('spreadsheetId'),
                     range: document.getElementById('range'),
+                    excludeColumns: document.getElementById('excludeColumns'),
                     nameColumn: document.getElementById('nameColumn'),
                     dateColumn: document.getElementById('dateColumn'),
                     subscriptionColumn: document.getElementById('subscriptionColumn'),
@@ -562,6 +642,7 @@
                 if (elements.apiKey) elements.apiKey.value = this.apiKey;
                 if (elements.spreadsheetId) elements.spreadsheetId.value = this.spreadsheetId;
                 if (elements.range) elements.range.value = this.range;
+                if (elements.excludeColumns) elements.excludeColumns.value = this.excludeColumns;
                 
                 // Load column mapping
                 if (elements.nameColumn) elements.nameColumn.value = this.columnMapping.name;
@@ -574,14 +655,16 @@
 
             bindEvents() {
                 const buttons = [
-                    { id: 'toggleConfig', handler: () => this.toggleConfiguration() },
+                    { id: 'toggleConfig', handler: () => this.requestPassword('config') },
                     { id: 'saveConfig', handler: () => this.saveConfiguration() },
                     { id: 'testConnection', handler: () => this.testConnection() },
                     { id: 'refreshData', handler: () => this.refreshData() },
                     { id: 'loadSample', handler: () => this.loadSampleData() },
-                    { id: 'toggleEdit', handler: () => this.toggleEditMode() },
+                    { id: 'toggleEdit', handler: () => this.requestPassword('edit') },
                     { id: 'toggleNames', handler: () => this.toggleNames() },
-                    { id: 'toggleColumnMapping', handler: () => this.toggleColumnMapping() }
+                    { id: 'toggleColumnMapping', handler: () => this.toggleColumnMapping() },
+                    { id: 'submitPassword', handler: () => this.handlePasswordSubmit() },
+                    { id: 'cancelPassword', handler: () => this.hidePasswordModal() }
                 ];
 
                 buttons.forEach(({ id, handler }) => {
@@ -590,6 +673,81 @@
                         element.addEventListener('click', handler);
                     }
                 });
+
+                // Add event listener for exclude columns input
+                const excludeColumnsInput = document.getElementById('excludeColumns');
+                if (excludeColumnsInput) {
+                    excludeColumnsInput.addEventListener('input', () => {
+                        this.updateExcludedColumnsDisplay();
+                    });
+                }
+            }
+
+            updateExcludedColumnsDisplay() {
+                const excludeColumnsInput = document.getElementById('excludeColumns');
+                const excludedColumnsList = document.getElementById('excludedColumnsList');
+                
+                if (!excludeColumnsInput || !excludedColumnsList) return;
+                
+                const value = excludeColumnsInput.value.trim();
+                const columns = value.split(',').map(col => col.trim().toUpperCase()).filter(col => col);
+                
+                excludedColumnsList.innerHTML = '';
+                
+                if (columns.length === 0) {
+                    excludedColumnsList.innerHTML = '<small>No columns excluded</small>';
+                    return;
+                }
+                
+                columns.forEach(col => {
+                    const label = document.createElement('label');
+                    label.innerHTML = `<input type="checkbox" checked> Column ${col}`;
+                    excludedColumnsList.appendChild(label);
+                });
+            }
+
+            showPasswordModal() {
+                const modal = document.getElementById('passwordModal');
+                if (modal) {
+                    modal.style.display = 'flex';
+                    document.getElementById('passwordInput').focus();
+                }
+            }
+
+            hidePasswordModal() {
+                const modal = document.getElementById('passwordModal');
+                if (modal) {
+                    modal.style.display = 'none';
+                    document.getElementById('passwordInput').value = '';
+                }
+            }
+
+            requestPassword(action) {
+                this.actionAfterAuth = action;
+                this.showPasswordModal();
+            }
+
+            handlePasswordSubmit() {
+                const passwordInput = document.getElementById('passwordInput');
+                if (!passwordInput) return;
+                
+                if (passwordInput.value === this.password) {
+                    this.hidePasswordModal();
+                    
+                    switch (this.actionAfterAuth) {
+                        case 'config':
+                            this.toggleConfiguration();
+                            break;
+                        case 'edit':
+                            this.toggleEditMode();
+                            break;
+                    }
+                    
+                    this.actionAfterAuth = null;
+                } else {
+                    this.showStatus('Incorrect password', 'error');
+                    passwordInput.value = '';
+                }
             }
 
             toggleConfiguration() {
@@ -612,10 +770,12 @@
                 const apiKeyEl = document.getElementById('apiKey');
                 const spreadsheetIdEl = document.getElementById('spreadsheetId');
                 const rangeEl = document.getElementById('range');
+                const excludeColumnsEl = document.getElementById('excludeColumns');
 
                 if (apiKeyEl) this.apiKey = apiKeyEl.value.trim();
                 if (spreadsheetIdEl) this.spreadsheetId = spreadsheetIdEl.value.trim();
                 if (rangeEl) this.range = rangeEl.value.trim() || 'Sheet1!A:J';
+                if (excludeColumnsEl) this.excludeColumns = excludeColumnsEl.value.trim();
 
                 // Save column mapping
                 const columnElements = {
@@ -637,6 +797,7 @@
                 this.setStorageItem('googleSheetsApiKey', this.apiKey);
                 this.setStorageItem('googleSpreadsheetId', this.spreadsheetId);
                 this.setStorageItem('googleSheetsRange', this.range);
+                this.setStorageItem('excludeColumns', this.excludeColumns);
                 this.setStorageItem('columnMapping', JSON.stringify(this.columnMapping));
 
                 this.showStatus('Configuration saved successfully!', 'success');
@@ -654,7 +815,10 @@
                 this.showStatus('Testing connection...', 'info');
                 
                 try {
-                    const url = `https://sheets.googleapis.com/v4/spreadsheets/${this.spreadsheetId}/values/${this.range}?key=${this.apiKey}`;
+                    // Process the range to exclude columns
+                    const processedRange = this.processRangeWithExclusions(this.range, this.excludeColumns);
+                    
+                    const url = `https://sheets.googleapis.com/v4/spreadsheets/${this.spreadsheetId}/values/${processedRange}?key=${this.apiKey}`;
                     const response = await fetch(url);
                     
                     if (response.ok) {
@@ -669,6 +833,38 @@
                 }
             }
 
+            processRangeWithExclusions(range, excludeColumns) {
+                if (!excludeColumns) return range;
+                
+                // Parse the range to get sheet name and column range
+                const match = range.match(/^([^!]+)!([A-Z]+):([A-Z]+)$/);
+                if (!match) return range;
+                
+                const sheetName = match[1];
+                const startCol = match[2];
+                const endCol = match[3];
+                
+                // Convert start and end columns to numbers
+                const startIndex = this.columnLetterToIndex(startCol);
+                const endIndex = this.columnLetterToIndex(endCol);
+                
+                // Parse excluded columns
+                const excludedIndices = excludeColumns.split(',')
+                    .map(col => col.trim().toUpperCase())
+                    .filter(col => col)
+                    .map(col => this.columnLetterToIndex(col));
+                
+                // Generate the new range
+                let newRange = [];
+                for (let i = startIndex; i <= endIndex; i++) {
+                    if (!excludedIndices.includes(i)) {
+                        newRange.push(this.indexToColumnLetter(i));
+                    }
+                }
+                
+                return `${sheetName}!${newRange.join(',')}`;
+            }
+
             async refreshData() {
                 if (!this.apiKey || !this.spreadsheetId) {
                     this.showStatus('Please configure Google Sheets API first', 'error');
@@ -681,7 +877,10 @@
                 this.showLoading();
 
                 try {
-                    const url = `https://sheets.googleapis.com/v4/spreadsheets/${this.spreadsheetId}/values/${this.range}?key=${this.apiKey}`;
+                    // Process the range to exclude columns
+                    const processedRange = this.processRangeWithExclusions(this.range, this.excludeColumns);
+                    
+                    const url = `https://sheets.googleapis.com/v4/spreadsheets/${this.spreadsheetId}/values/${processedRange}?key=${this.apiKey}`;
                     const response = await fetch(url);
                     
                     if (!response.ok) {
@@ -735,6 +934,46 @@
             showLoading() {
                 const tbody = document.getElementById('dataTable');
                 if (tbody) {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="6" class="loading">
+                                <div class="spinner"></div>
+                                Loading data from Google Sheets...
+                            </td>
+                        </tr>
+                    `;
+                }
+            }
+
+            showError(message) {
+                const tbody = document.getElementById('dataTable');
+                if (tbody) {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="6" class="loading" style="color: #dc2626;">
+                                ❌ ${message}<br>
+                                <small style="color: #6b7280; margin-top: 8px; display: block;">
+                                    Use "Configure API" to set up your Google Sheets connection, or contact support if the issue persists.
+                                </small>
+                            </td>
+                        </tr>
+                    `;
+                }
+            }
+
+            columnLetterToIndex(letter) {
+                return letter.charCodeAt(0) - 'A'.charCodeAt(0);
+            }
+
+            indexToColumnLetter(index) {
+                return String.fromCharCode('A'.charCodeAt(0) + index);
+            }
+
+            renderTable() {
+                const tbody = document.getElementById('dataTable');
+                if (!tbody) return;
+
+                if (!this.data || this.data.length === 0) {
                     tbody.innerHTML = `
                         <tr>
                             <td colspan="6" class="loading">
