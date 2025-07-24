@@ -827,52 +827,65 @@
                 }
                 
                 const sheetName = match[1];
-                const columnsPart = match[2];
+                let columnsPart = match[2];
                 
-                // Check if it's already a list of columns (like A,C,D)
+                // Parse excluded columns
+                const excludedCols = excludeColumns.split(',')
+                    .map(col => col.trim().toUpperCase())
+                    .filter(col => col);
+                
+                // If it's already a list of columns (like A,C,D)
                 if (columnsPart.includes(',')) {
-                    // If it's already comma-separated, just return as-is
-                    return range;
+                    const columns = columnsPart.split(',')
+                        .map(col => col.trim().toUpperCase())
+                        .filter(col => !excludedCols.includes(col));
+                    
+                    if (columns.length === 0) {
+                        throw new Error('All columns were excluded');
+                    }
+                    
+                    return `${sheetName}!${columns.join(',')}`;
                 }
                 
                 // Handle range format (like A:F)
                 const rangeMatch = columnsPart.match(/^([A-Za-z]+):([A-Za-z]+)$/);
-                if (!rangeMatch) {
-                    // If it's not a range either, treat as single column
-                    return range;
-                }
-                
-                const startCol = rangeMatch[1].toUpperCase();
-                const endCol = rangeMatch[2].toUpperCase();
-                
-                // Convert start and end columns to numbers
-                const startIndex = this.columnLetterToIndex(startCol);
-                const endIndex = this.columnLetterToIndex(endCol);
-                
-                // Parse excluded columns
-                const excludedIndices = excludeColumns.split(',')
-                    .map(col => col.trim().toUpperCase())
-                    .filter(col => col)
-                    .map(col => this.columnLetterToIndex(col));
-                
-                // Generate the new range
-                let includedColumns = [];
-                for (let i = startIndex; i <= endIndex; i++) {
-                    if (!excludedIndices.includes(i)) {
-                        includedColumns.push(this.indexToColumnLetter(i));
+                if (rangeMatch) {
+                    const startCol = rangeMatch[1].toUpperCase();
+                    const endCol = rangeMatch[2].toUpperCase();
+                    
+                    // Convert start and end columns to numbers
+                    const startIndex = this.columnLetterToIndex(startCol);
+                    const endIndex = this.columnLetterToIndex(endCol);
+                    
+                    // Parse excluded columns to indices
+                    const excludedIndices = excludedCols.map(col => this.columnLetterToIndex(col));
+                    
+                    // Generate the new range
+                    let includedColumns = [];
+                    for (let i = startIndex; i <= endIndex; i++) {
+                        if (!excludedIndices.includes(i)) {
+                            includedColumns.push(this.indexToColumnLetter(i));
+                        }
+                    }
+                    
+                    if (includedColumns.length === 0) {
+                        throw new Error('All columns were excluded');
+                    }
+                    
+                    // If the included columns are contiguous, return a range (A:C), otherwise return individual columns (A,C,D)
+                    if (this.isContiguous(includedColumns)) {
+                        return `${sheetName}!${includedColumns[0]}:${includedColumns[includedColumns.length-1]}`;
+                    } else {
+                        return `${sheetName}!${includedColumns.join(',')}`;
                     }
                 }
                 
-                if (includedColumns.length === 0) {
-                    throw new Error('All columns were excluded');
+                // If it's a single column (like A)
+                if (!excludedCols.includes(columnsPart.toUpperCase())) {
+                    return range;
                 }
                 
-                // If the included columns are contiguous, return a range (A:C), otherwise return individual columns (A,C,D)
-                if (this.isContiguous(includedColumns)) {
-                    return `${sheetName}!${includedColumns[0]}:${includedColumns[includedColumns.length-1]}`;
-                } else {
-                    return `${sheetName}!${includedColumns.join(',')}`;
-                }
+                throw new Error('The only column was excluded');
             }
 
             isContiguous(columns) {
@@ -884,6 +897,14 @@
                     }
                 }
                 return true;
+            }
+
+            columnLetterToIndex(letter) {
+                return letter.charCodeAt(0) - 'A'.charCodeAt(0);
+            }
+
+            indexToColumnLetter(index) {
+                return String.fromCharCode('A'.charCodeAt(0) + index);
             }
 
             async refreshData() {
@@ -997,14 +1018,6 @@
                         });
                     }
                 }
-            }
-
-            columnLetterToIndex(letter) {
-                return letter.charCodeAt(0) - 'A'.charCodeAt(0);
-            }
-
-            indexToColumnLetter(index) {
-                return String.fromCharCode('A'.charCodeAt(0) + index);
             }
 
             renderTable() {
