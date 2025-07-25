@@ -571,9 +571,9 @@
                 this.spreadsheetId = this.getStorageItem('googleSpreadsheetId', '');
                 this.range = this.getStorageItem('googleSheetsRange', 'Sheet1!A:J');
                 this.excludeColumns = this.getStorageItem('excludeColumns', '');
-                this.columnMapping = JSON.parse(this.getStorageItem('columnMapping', '{"name":"A","date":"B","subscription":"C","diastolic":"D","systolic":"E","scanCount":"F"}'));
+                this.columnMapping = JSON.parse(this.getStorageItem('columnMapping', '{"name":"A","date":"F","subscription":"H","diastolic":"E","systolic":"D","scanCount":"C"}'));
                 this.data = [];
-                this.password = "admin123"; // Default password - change this in production
+                this.password = "merisehat"; // Default password - change this in production
                 this.actionAfterAuth = null;
                 
                 this.initializeApp();
