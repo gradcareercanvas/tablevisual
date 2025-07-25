@@ -524,11 +524,11 @@
                 <thead>
                     <tr>
                         <!-- NEW: Clickable headers with sort indicators -->
-                        <th data-column="name" data-default-sort="asc">Name <span class="sort-indicator" id="sort-name">▲</span></th>
-                        <th data-column="last_scan_date" data-default-sort="desc">Last Scan Date <span class="sort-indicator" id="sort-last_scan_date">▼</span></th>
-                        <th data-column="is_active_subscription" data-default-sort="desc" class="th-center">Is Active Subscription <span class="sort-indicator" id="sort-is_active_subscription">▼</span></th>
-                        <th data-column="avg_diastolic" data-default-sort="desc" class="th-right">Avg Diastolic <span class="sort-indicator" id="sort-avg_diastolic">▼</span></th>
-                        <th data-column="avg_systolic" data-default-sort="desc" class="th-right">Avg Systolic <span class="sort-indicator" id="sort-avg_systolic">▼</span></th>
+                        <th data-column="name" data-default-sort="asc">Name <span class="sort-indicator" id="sort-name">▲▼</span></th>
+                        <th data-column="last_scan_date" data-default-sort="desc">Last Scan Date <span class="sort-indicator" id="sort-last_scan_date">▲▼</span></th>
+                        <th data-column="is_active_subscription" data-default-sort="desc" class="th-center">Is Active Subscription <span class="sort-indicator" id="sort-is_active_subscription">▲▼</span></th>
+                        <th data-column="avg_diastolic" data-default-sort="desc" class="th-right">Avg Diastolic <span class="sort-indicator" id="sort-avg_diastolic">▲▼</span></th>
+                        <th data-column="avg_systolic" data-default-sort="desc" class="th-right">Avg Systolic <span class="sort-indicator" id="sort-avg_systolic">▲▼</span></th>
                         <th data-column="scan_count" data-default-sort="desc" class="th-right">Scan Count <span class="sort-indicator asc" id="sort-scan_count">▼</span></th>
                     </tr>
                 </thead>
@@ -829,6 +829,7 @@
                     clearInterval(this.autoRefreshInterval);
                 }
                 const intervalTime = 24 * 60 * 60 * 1000; // 24 hours
+                // const intervalTime = 5 * 60 * 1000; // 5 minutes for testing
                 this.autoRefreshInterval = setInterval(() => {
                     console.log("Attempting scheduled auto-refresh...");
                     if (this.apiKey && this.spreadsheetId) {
@@ -876,6 +877,8 @@
                 this.showStatus('Configuration saved successfully!', 'success');
                 const config = document.getElementById('googleSheetsConfig');
                 if (config) config.style.display = 'none';
+
+                // NEW: Restart auto-refresh timer if config changes
                 this.startAutoRefresh();
             }
             async testConnection() {
@@ -885,6 +888,7 @@
                 }
                 this.showStatus('Testing connection...', 'info');
                 try {
+                    // Process the range to exclude columns
                     let processedRange;
                     try {
                         processedRange = this.processRangeWithExclusions(this.range, this.excludeColumns);
@@ -907,22 +911,29 @@
             }
             processRangeWithExclusions(range, excludeColumns) {
     if (!range) throw new Error('Range cannot be empty');
+    // Parse the range to get sheet name and columns
     const match = range.match(/^(.*?)!(.+)$/);
     if (!match) {
         throw new Error(`Invalid range format: ${range}. Expected format: "SheetName!A:Z" or "SheetName!A,C,D"`);
     }
     const sheetName = match[1];
     let columnsPart = match[2];
+    // If no columns to exclude, return original range
     if (!excludeColumns || excludeColumns.trim() === '') {
         return range;
     }
+    // Parse excluded columns
     const excludedCols = excludeColumns.split(',')
         .map(col => col.trim().toUpperCase())
         .filter(col => col);
+    // For non-contiguous column lists (like A,C,D,E,F,H)
     if (columnsPart.includes(',')) {
         const columns = columnsPart.split(',')
             .map(col => col.trim().toUpperCase())
             .filter(col => {
+                // Only include columns that:
+                // 1. Are valid column letters (A-Z)
+                // 2. Aren't in the excluded list
                 return /^[A-Z]+$/.test(col) && !excludedCols.includes(col);
             });
         if (columns.length === 0) {
@@ -930,6 +941,7 @@
         }
         return `${sheetName}!${columns.join(',')}`;
     }
+    // Handle range format (like A:F)
     const rangeMatch = columnsPart.match(/^([A-Za-z]+):([A-Za-z]+)$/i);
     if (rangeMatch) {
         const startCol = rangeMatch[1].toUpperCase();
@@ -952,6 +964,7 @@
             return `${sheetName}!${includedColumns.join(',')}`;
         }
     }
+    // If it's a single column (like A)
     if (/^[A-Za-z]+$/.test(columnsPart)) {
         if (!excludedCols.includes(columnsPart.toUpperCase())) {
             return range;
@@ -960,28 +973,31 @@
     }
     throw new Error(`Invalid column specification: ${columnsPart}`);
 }
-            isContiguous(columns) {
-                for (let i = 1; i < columns.length; i++) {
-                    const prevIndex = this.columnLetterToIndex(columns[i-1]);
-                    const currIndex = this.columnLetterToIndex(columns[i]);
-                    if (currIndex !== prevIndex + 1) {
-                        return false;
-                    }
-                }
-                return true;
-            }
-            columnLetterToIndex(letter) {
-                if (!/^[A-Za-z]+$/.test(letter)) {
-                    throw new Error(`Invalid column letter: ${letter}`);
-                }
-                return letter.toUpperCase().charCodeAt(0) - 'A'.charCodeAt(0);
-            }
-            indexToColumnLetter(index) {
-                if (index < 0 || index > 25) {
-                    throw new Error(`Column index out of range: ${index}`);
-                }
-                return String.fromCharCode('A'.charCodeAt(0) + index);
-            }
+// Helper function to check if columns are contiguous
+isContiguous(columns) {
+    for (let i = 1; i < columns.length; i++) {
+        const prevIndex = this.columnLetterToIndex(columns[i-1]);
+        const currIndex = this.columnLetterToIndex(columns[i]);
+        if (currIndex !== prevIndex + 1) {
+            return false;
+        }
+    }
+    return true;
+}
+// Convert column letter to index (A=0, B=1, etc.)
+columnLetterToIndex(letter) {
+    if (!/^[A-Za-z]+$/.test(letter)) {
+        throw new Error(`Invalid column letter: ${letter}`);
+    }
+    return letter.toUpperCase().charCodeAt(0) - 'A'.charCodeAt(0);
+}
+// Convert index to column letter (0=A, 1=B, etc.)
+indexToColumnLetter(index) {
+    if (index < 0 || index > 25) {
+        throw new Error(`Column index out of range: ${index}`);
+    }
+    return String.fromCharCode('A'.charCodeAt(0) + index);
+}
             async refreshData() {
                 if (!this.apiKey || !this.spreadsheetId) {
                     this.showStatus('Please configure Google Sheets API first', 'error');
@@ -992,6 +1008,7 @@
                 this.showStatus('Loading data from Google Sheets...', 'info');
                 this.showLoading();
                 try {
+                    // Process the range to exclude columns
                     let processedRange;
                     try {
                         processedRange = this.processRangeWithExclusions(this.range, this.excludeColumns);
@@ -1011,6 +1028,7 @@
                     if (rows.length < 2) {
                         throw new Error('No data found or insufficient data (need at least 1 header row and 1 data row)');
                     }
+                    // Process data using column mapping
                     try {
                         this.data = rows.slice(1).map(row => ({
                             name: row[this.columnLetterToIndex(this.columnMapping.name)] || '',
@@ -1036,6 +1054,7 @@
                         1. Your API key and spreadsheet ID<br>
                         2. The sheet name and range are correct<br>
                         3. Your column mapping matches your sheet structure`);
+                    // Show configuration panel to help user fix the issue
                     const config = document.getElementById('googleSheetsConfig');
                     if (config) config.style.display = 'block';
                 }
@@ -1066,6 +1085,7 @@
                             </td>
                         </tr>
                     `;
+                    // Add event listener to the new button
                     const showConfigBtn = document.getElementById('showConfigFromError');
                     if (showConfigBtn) {
                         showConfigBtn.addEventListener('click', () => {
@@ -1173,6 +1193,7 @@
                 this.updateSortIndicators();
             }
             getBPStatus(systolic, diastolic) {
+                // Determine BP status based on guidelines
                 let systolicStatus = 'normal';
                 let diastolicStatus = 'normal';
                 if (systolic >= 140 || diastolic >= 90) {
@@ -1195,6 +1216,7 @@
                 statusEl.textContent = message;
                 statusEl.className = `status ${type}`;
                 statusEl.style.display = 'block';
+                // Auto-hide after 5 seconds
                 setTimeout(() => {
                     statusEl.style.display = 'none';
                 }, 5000);
@@ -1229,6 +1251,7 @@
                 this.renderTable();
             }
         }
+        // Initialize the app when DOM is loaded
         document.addEventListener('DOMContentLoaded', () => {
             window.sehatScanLeaderboard = new SehatScanLeaderboard();
         });
