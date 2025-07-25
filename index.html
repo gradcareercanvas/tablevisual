@@ -818,90 +818,112 @@
             }
 
             processRangeWithExclusions(range, excludeColumns) {
-                if (!excludeColumns || excludeColumns.trim() === '') return range;
-                
-                // Parse the range to get sheet name and columns
-                const match = range.match(/^(.*?)!(.+)$/);
-                if (!match) {
-                    throw new Error(`Invalid range format: ${range}. Expected format: "SheetName!A:Z" or "SheetName!A,C,D"`);
-                }
-                
-                const sheetName = match[1];
-                let columnsPart = match[2];
-                
-                // Parse excluded columns
-                const excludedCols = excludeColumns.split(',')
-                    .map(col => col.trim().toUpperCase())
-                    .filter(col => col);
-                
-                // If it's already a list of columns (like A,C,D,E,F,H)
-                if (columnsPart.includes(',')) {
-                    const columns = columnsPart.split(',')
-                        .map(col => col.trim().toUpperCase())
-                        .filter(col => !excludedCols.includes(col));
-                    
-                    if (columns.length === 0) {
-                        throw new Error('All columns were excluded');
-                    }
-                    
-                    return `${sheetName}!${columns.join(',')}`;
-                }
-                
-                // Handle range format (like A:F)
-                const rangeMatch = columnsPart.match(/^([A-Za-z]+):([A-Za-z]+)$/);
-                if (rangeMatch) {
-                    const startCol = rangeMatch[1].toUpperCase();
-                    const endCol = rangeMatch[2].toUpperCase();
-                    
-                    const startIndex = this.columnLetterToIndex(startCol);
-                    const endIndex = this.columnLetterToIndex(endCol);
-                    
-                    const excludedIndices = excludedCols.map(col => this.columnLetterToIndex(col));
-                    
-                    let includedColumns = [];
-                    for (let i = startIndex; i <= endIndex; i++) {
-                        if (!excludedIndices.includes(i)) {
-                            includedColumns.push(this.indexToColumnLetter(i));
-                        }
-                    }
-                    
-                    if (includedColumns.length === 0) {
-                        throw new Error('All columns were excluded');
-                    }
-                    
-                    if (this.isContiguous(includedColumns)) {
-                        return `${sheetName}!${includedColumns[0]}:${includedColumns[includedColumns.length-1]}`;
-                    } else {
-                        return `${sheetName}!${includedColumns.join(',')}`;
-                    }
-                }
-                
-                // If it's a single column (like A)
-                if (!excludedCols.includes(columnsPart.toUpperCase())) {
-                    return range;
-                }
-                
-                throw new Error('The only column was excluded');
+    if (!range) throw new Error('Range cannot be empty');
+    
+    // Parse the range to get sheet name and columns
+    const match = range.match(/^(.*?)!(.+)$/);
+    if (!match) {
+        throw new Error(`Invalid range format: ${range}. Expected format: "SheetName!A:Z" or "SheetName!A,C,D"`);
+    }
+    
+    const sheetName = match[1];
+    let columnsPart = match[2];
+    
+    // If no columns to exclude, return original range
+    if (!excludeColumns || excludeColumns.trim() === '') {
+        return range;
+    }
+    
+    // Parse excluded columns
+    const excludedCols = excludeColumns.split(',')
+        .map(col => col.trim().toUpperCase())
+        .filter(col => col);
+    
+    // For non-contiguous column lists (like A,C,D,E,F,H)
+    if (columnsPart.includes(',')) {
+        const columns = columnsPart.split(',')
+            .map(col => col.trim().toUpperCase())
+            .filter(col => {
+                // Only include columns that:
+                // 1. Are valid column letters (A-Z)
+                // 2. Aren't in the excluded list
+                return /^[A-Z]+$/.test(col) && !excludedCols.includes(col);
+            });
+        
+        if (columns.length === 0) {
+            throw new Error('All columns were excluded - please check your excluded columns list');
+        }
+        
+        return `${sheetName}!${columns.join(',')}`;
+    }
+    
+    // Handle range format (like A:F)
+    const rangeMatch = columnsPart.match(/^([A-Za-z]+):([A-Za-z]+)$/i);
+    if (rangeMatch) {
+        const startCol = rangeMatch[1].toUpperCase();
+        const endCol = rangeMatch[2].toUpperCase();
+        
+        const startIndex = this.columnLetterToIndex(startCol);
+        const endIndex = this.columnLetterToIndex(endCol);
+        
+        const excludedIndices = excludedCols.map(col => this.columnLetterToIndex(col));
+        
+        let includedColumns = [];
+        for (let i = startIndex; i <= endIndex; i++) {
+            if (!excludedIndices.includes(i)) {
+                includedColumns.push(this.indexToColumnLetter(i));
             }
+        }
+        
+        if (includedColumns.length === 0) {
+            throw new Error('All columns in range were excluded');
+        }
+        
+        if (this.isContiguous(includedColumns)) {
+            return `${sheetName}!${includedColumns[0]}:${includedColumns[includedColumns.length-1]}`;
+        } else {
+            return `${sheetName}!${includedColumns.join(',')}`;
+        }
+    }
+    
+    // If it's a single column (like A)
+    if (/^[A-Za-z]+$/.test(columnsPart)) {
+        if (!excludedCols.includes(columnsPart.toUpperCase())) {
+            return range;
+        }
+        throw new Error('The only column was excluded');
+    }
+    
+    throw new Error(`Invalid column specification: ${columnsPart}`);
+}
 
-            isContiguous(columns) {
-                for (let i = 1; i < columns.length; i++) {
-                    const prevIndex = this.columnLetterToIndex(columns[i-1]);
-                    const currIndex = this.columnLetterToIndex(columns[i]);
-                    if (currIndex !== prevIndex + 1) {
-                        return false;
-                    }
-                }
-                return true;
-            }
+// Helper function to check if columns are contiguous
+isContiguous(columns) {
+    for (let i = 1; i < columns.length; i++) {
+        const prevIndex = this.columnLetterToIndex(columns[i-1]);
+        const currIndex = this.columnLetterToIndex(columns[i]);
+        if (currIndex !== prevIndex + 1) {
+            return false;
+        }
+    }
+    return true;
+}
 
-            columnLetterToIndex(letter) {
-                return letter.charCodeAt(0) - 'A'.charCodeAt(0);
-            }
+// Convert column letter to index (A=0, B=1, etc.)
+columnLetterToIndex(letter) {
+    if (!/^[A-Za-z]+$/.test(letter)) {
+        throw new Error(`Invalid column letter: ${letter}`);
+    }
+    return letter.toUpperCase().charCodeAt(0) - 'A'.charCodeAt(0);
+}
 
-            indexToColumnLetter(index) {
-                return String.fromCharCode('A'.charCodeAt(0) + index);
-            }
+// Convert index to column letter (0=A, 1=B, etc.)
+indexToColumnLetter(index) {
+    if (index < 0 || index > 25) {
+        throw new Error(`Column index out of range: ${index}`);
+    }
+    return String.fromCharCode('A'.charCodeAt(0) + index);
+}
 
             async refreshData() {
                 if (!this.apiKey || !this.spreadsheetId) {
