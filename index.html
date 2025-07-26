@@ -10,11 +10,13 @@
             padding: 0;
             box-sizing: border-box;
         }
+
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background-color: #f8fafc;
             padding: 20px;
         }
+
         .container {
             max-width: 1400px;
             margin: 0 auto;
@@ -23,6 +25,7 @@
             border-radius: 8px;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         }
+
         .header {
             display: flex;
             justify-content: space-between;
@@ -31,36 +34,20 @@
             flex-wrap: wrap;
             gap: 16px;
         }
+
         .header h1 {
             font-size: 24px;
             font-weight: bold;
             color: #1f2937;
         }
+
         .controls {
             display: flex;
             gap: 12px;
             align-items: center;
             flex-wrap: wrap;
         }
-        /* NEW: Style for filter and sort controls */
-        .filter-sort-controls {
-            display: flex;
-            gap: 12px;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-        .filter-sort-controls label {
-            font-weight: 500;
-            color: #374151;
-            font-size: 14px;
-        }
-        .filter-sort-controls select {
-            padding: 6px 10px;
-            border: 1px solid #d1d5db;
-            border-radius: 4px;
-            font-size: 14px;
-            background-color: white;
-        }
+
         .btn {
             display: flex;
             align-items: center;
@@ -73,27 +60,34 @@
             font-weight: 500;
             transition: all 0.2s;
         }
+
         .btn-primary {
             background-color: #3b82f6;
             color: white;
         }
+
         .btn-primary:hover {
             background-color: #2563eb;
         }
+
         .btn-secondary {
             background-color: #6b7280;
             color: white;
         }
+
         .btn-secondary:hover {
             background-color: #4b5563;
         }
+
         .btn-success {
             background-color: #10b981;
             color: white;
         }
+
         .btn-success:hover {
             background-color: #059669;
         }
+
         .google-sheets-config {
             background-color: #f3f4f6;
             padding: 16px;
@@ -101,6 +95,7 @@
             margin-bottom: 16px;
             border: 1px solid #d1d5db;
         }
+
         .config-row {
             display: flex;
             gap: 12px;
@@ -108,14 +103,17 @@
             align-items: center;
             flex-wrap: wrap;
         }
+
         .config-row:last-child {
             margin-bottom: 0;
         }
+
         .config-row label {
             font-weight: 500;
             min-width: 120px;
             color: #374151;
         }
+
         .config-row input {
             flex: 1;
             min-width: 200px;
@@ -124,11 +122,13 @@
             border-radius: 4px;
             font-size: 14px;
         }
+
         .config-row input:focus {
             outline: none;
             border-color: #3b82f6;
             box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
         }
+
         .column-select {
             flex: 1;
             min-width: 120px;
@@ -137,11 +137,13 @@
             border-radius: 4px;
             font-size: 14px;
         }
+
         .column-select:focus {
             outline: none;
             border-color: #3b82f6;
             box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
         }
+
         .status {
             padding: 12px 16px;
             border-radius: 6px;
@@ -149,35 +151,42 @@
             font-size: 14px;
             display: none;
         }
+
         .status.success {
             background-color: #dcfce7;
             color: #166534;
             border: 1px solid #bbf7d0;
         }
+
         .status.error {
             background-color: #fef2f2;
             color: #dc2626;
             border: 1px solid #fecaca;
         }
+
         .status.info {
             background-color: #eff6ff;
             color: #1d4ed8;
             border: 1px solid #bfdbfe;
         }
+
         .table-container {
             overflow-x: auto;
             border-radius: 8px;
             border: 1px solid #e5e7eb;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         }
+
         table {
             width: 100%;
             border-collapse: collapse;
             background: white;
         }
+
         thead {
             background-color: #f9fafb;
         }
+
         th {
             padding: 12px 16px;
             text-align: left;
@@ -188,72 +197,71 @@
             letter-spacing: 0.05em;
             border-right: 1px solid #e5e7eb;
             position: relative;
-            cursor: pointer; /* NEW: Indicate clickable */
         }
-        th:hover {
-             background-color: #e5e7eb; /* NEW: Visual feedback on hover */
-        }
+
         th:last-child {
             border-right: none;
         }
-        /* NEW: Styles for sort indicators */
-        .sort-indicator {
-            margin-left: 5px;
-            font-size: 10px;
-            color: #9ca3af; /* Default gray */
-        }
-        .sort-indicator.asc {
-            color: #3b82f6; /* Blue for ascending */
-        }
-        .sort-indicator.desc {
-            color: #3b82f6; /* Blue for descending */
-        }
+
         .th-center {
             text-align: center;
         }
+
         .th-right {
             text-align: right;
         }
+
         tbody tr {
             transition: background-color 0.2s;
         }
+
         tbody tr:hover {
             background-color: #f9fafb;
         }
+
         td {
             padding: 12px 16px;
             font-size: 14px;
             border-right: 1px solid #e5e7eb;
             border-bottom: 1px solid #e5e7eb;
         }
+
         td:last-child {
             border-right: none;
         }
+
         .td-center {
             text-align: center;
         }
+
         .td-right {
             text-align: right;
         }
+
         .name-cell {
             font-weight: 500;
             color: #1f2937;
         }
+
         .blackout {
             background-color: #000;
             color: #000;
             user-select: none;
             border-radius: 2px;
         }
+
         .bp-normal {
             background-color: #dcfce7;
         }
+
         .bp-elevated {
             background-color: #fef3c7;
         }
+
         .bp-high {
             background-color: #fee2e2;
         }
+
         .edit-mode-info {
             background-color: #eff6ff;
             border: 1px solid #bfdbfe;
@@ -263,14 +271,17 @@
             margin-top: 16px;
             display: none;
         }
+
         .edit-mode-info.show {
             display: block;
         }
+
         .loading {
             text-align: center;
             padding: 40px;
             color: #6b7280;
         }
+
         .spinner {
             display: inline-block;
             width: 20px;
@@ -281,6 +292,7 @@
             animation: spin 1s linear infinite;
             margin-right: 8px;
         }
+
         .password-modal {
             display: none;
             position: fixed;
@@ -293,6 +305,7 @@
             justify-content: center;
             align-items: center;
         }
+
         .password-modal-content {
             background-color: white;
             padding: 24px;
@@ -301,10 +314,12 @@
             max-width: 400px;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         }
+
         .password-modal h3 {
             margin-bottom: 16px;
             color: #1f2937;
         }
+
         .password-modal input {
             width: 100%;
             padding: 10px;
@@ -312,17 +327,20 @@
             border: 1px solid #d1d5db;
             border-radius: 4px;
         }
+
         .password-modal-actions {
             display: flex;
             justify-content: flex-end;
             gap: 8px;
         }
+
         .excluded-columns {
             display: flex;
             flex-wrap: wrap;
             gap: 8px;
             margin-top: 8px;
         }
+
         .excluded-columns label {
             display: flex;
             align-items: center;
@@ -330,22 +348,27 @@
             font-size: 14px;
             cursor: pointer;
         }
+
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+
         @media (max-width: 768px) {
             .header {
                 flex-direction: column;
                 align-items: stretch;
             }
+
             .controls {
                 justify-content: center;
             }
+
             .config-row {
                 flex-direction: column;
                 align-items: stretch;
             }
+
             .config-row label {
                 min-width: auto;
             }
@@ -357,36 +380,13 @@
         <div class="header">
             <h1>Sehat Scan All Time Leaderboard</h1>
             <div class="controls">
-                 <!-- NEW: Filter and Sort Controls -->
-                <div class="filter-sort-controls">
-                    <label for="recordFilter">Show:</label>
-                    <select id="recordFilter">
-                        <option value="all">All Records</option>
-                        <option value="top10">Top 10</option>
-                    </select>
-
-                    <label for="sortColumn">Sort By:</label>
-                    <select id="sortColumn">
-                        <option value="scan_count">Scan Count</option>
-                        <option value="name">Name</option>
-                        <option value="last_scan_date">Last Scan Date</option>
-                        <option value="avg_systolic">Avg Systolic</option>
-                        <option value="avg_diastolic">Avg Diastolic</option>
-                        <option value="is_active_subscription">Active Subscription</option>
-                    </select>
-
-                    <label for="sortDirection">Order:</label>
-                    <select id="sortDirection">
-                        <option value="desc">Descending</option>
-                        <option value="asc">Ascending</option>
-                    </select>
-                </div>
                 <button id="toggleConfig" class="btn btn-secondary">⚙️ Configure API</button>
                 <button id="refreshData" class="btn btn-success">🔄 Refresh Data</button>
                 <button id="toggleNames" class="btn btn-secondary" style="display: none;">👁️ Hide Names</button>
                 <button id="toggleEdit" class="btn btn-primary">✏️ Edit Mode</button>
             </div>
         </div>
+
         <div id="googleSheetsConfig" class="google-sheets-config" style="display: none;">
             <h3 style="margin-bottom: 12px; color: #374151;">Google Sheets Configuration</h3>
             <div class="config-row">
@@ -518,18 +518,19 @@
                 5. Use "Configure Columns" to map your sheet columns to display fields
             </div>
         </div>
+
         <div id="statusMessage" class="status"></div>
+
         <div class="table-container">
             <table>
                 <thead>
                     <tr>
-                        <!-- NEW: Clickable headers with sort indicators -->
-                        <th data-column="name" data-default-sort="asc">Name <span class="sort-indicator" id="sort-name">▲▼</span></th>
-                        <th data-column="last_scan_date" data-default-sort="desc">Last Scan Date <span class="sort-indicator" id="sort-last_scan_date">▲▼</span></th>
-                        <th data-column="is_active_subscription" data-default-sort="desc" class="th-center">Is Active Subscription <span class="sort-indicator" id="sort-is_active_subscription">▲▼</span></th>
-                        <th data-column="avg_diastolic" data-default-sort="desc" class="th-right">Avg Diastolic <span class="sort-indicator" id="sort-avg_diastolic">▲▼</span></th>
-                        <th data-column="avg_systolic" data-default-sort="desc" class="th-right">Avg Systolic <span class="sort-indicator" id="sort-avg_systolic">▲▼</span></th>
-                        <th data-column="scan_count" data-default-sort="desc" class="th-right">Scan Count <span class="sort-indicator asc" id="sort-scan_count">▼</span></th>
+                        <th>Name ▲</th>
+                        <th>Last Scan Date</th>
+                        <th class="th-center">Is Active Subscription</th>
+                        <th class="th-right">Avg Diastolic</th>
+                        <th class="th-right">Avg Systolic</th>
+                        <th class="th-right">Scan Count</th>
                     </tr>
                 </thead>
                 <tbody id="dataTable">
@@ -542,11 +543,13 @@
                 </tbody>
             </table>
         </div>
+
         <div id="editModeInfo" class="edit-mode-info">
             <strong>✏️ Edit Mode Active</strong><br>
             Use the "Hide Names" button to blackout sensitive information in the name column.
         </div>
     </div>
+
     <!-- Password Modal -->
     <div id="passwordModal" class="password-modal">
         <div class="password-modal-content">
@@ -558,6 +561,7 @@
             </div>
         </div>
     </div>
+
     <script>
         class SehatScanLeaderboard {
             constructor() {
@@ -567,21 +571,12 @@
                 this.spreadsheetId = this.getStorageItem('googleSpreadsheetId', '');
                 this.range = this.getStorageItem('googleSheetsRange', 'Sheet1!A:J');
                 this.excludeColumns = this.getStorageItem('excludeColumns', '');
-                this.columnMapping = JSON.parse(this.getStorageItem('columnMapping', '{"name":"A","date":"F","subscription":"H","diastolic":"E","systolic":"D","scanCount":"C"}'));
+                this.columnMapping = JSON.parse(this.getStorageItem('columnMapping', '{"name":"A","date":"B","subscription":"C","diastolic":"D","systolic":"E","scanCount":"F"}'));
                 this.data = [];
-                this.password = "merisehat"; // Default password - change this in production
+                this.password = "admin123"; // Default password - change this in production
                 this.actionAfterAuth = null;
-
-                // NEW: Properties for sorting and filtering
-                this.currentSortColumn = 'scan_count'; // Default sort column
-                this.currentSortDirection = 'desc'; // Default sort direction
-                this.recordFilter = 'all'; // Default filter
-
-                this.autoRefreshInterval = null;
-
+                
                 this.initializeApp();
-                this.autoLoadDataIfConfigured();
-                this.startAutoRefresh();
             }
 
             // Safe storage methods
@@ -593,6 +588,7 @@
                     return defaultValue;
                 }
             }
+
             setStorageItem(key, value) {
                 try {
                     localStorage.setItem(key, value);
@@ -600,11 +596,13 @@
                     console.warn('localStorage not available:', e);
                 }
             }
+
             initializeApp() {
                 this.loadSavedConfig();
                 this.bindEvents();
                 this.updateExcludedColumnsDisplay();
             }
+
             loadSavedConfig() {
                 const elements = {
                     apiKey: document.getElementById('apiKey'),
@@ -618,11 +616,13 @@
                     systolicColumn: document.getElementById('systolicColumn'),
                     scanCountColumn: document.getElementById('scanCountColumn')
                 };
+
                 // Set values if elements exist
                 if (elements.apiKey) elements.apiKey.value = this.apiKey;
                 if (elements.spreadsheetId) elements.spreadsheetId.value = this.spreadsheetId;
                 if (elements.range) elements.range.value = this.range;
                 if (elements.excludeColumns) elements.excludeColumns.value = this.excludeColumns;
+                
                 // Load column mapping
                 if (elements.nameColumn) elements.nameColumn.value = this.columnMapping.name;
                 if (elements.dateColumn) elements.dateColumn.value = this.columnMapping.date;
@@ -630,16 +630,8 @@
                 if (elements.diastolicColumn) elements.diastolicColumn.value = this.columnMapping.diastolic;
                 if (elements.systolicColumn) elements.systolicColumn.value = this.columnMapping.systolic;
                 if (elements.scanCountColumn) elements.scanCountColumn.value = this.columnMapping.scanCount;
-
-                // NEW: Load filter and sort state
-                const recordFilterEl = document.getElementById('recordFilter');
-                const sortColumnEl = document.getElementById('sortColumn');
-                const sortDirectionEl = document.getElementById('sortDirection');
-
-                if (recordFilterEl) recordFilterEl.value = this.recordFilter;
-                if (sortColumnEl) sortColumnEl.value = this.currentSortColumn;
-                if (sortDirectionEl) sortDirectionEl.value = this.currentSortDirection;
             }
+
             bindEvents() {
                 const buttons = [
                     { id: 'toggleConfig', handler: () => this.requestPassword('config') },
@@ -652,45 +644,12 @@
                     { id: 'submitPassword', handler: () => this.handlePasswordSubmit() },
                     { id: 'cancelPassword', handler: () => this.hidePasswordModal() }
                 ];
+
                 buttons.forEach(({ id, handler }) => {
                     const element = document.getElementById(id);
                     if (element) {
                         element.addEventListener('click', handler);
                     }
-                });
-
-                // NEW: Bind events for filter and sort controls
-                const recordFilterEl = document.getElementById('recordFilter');
-                const sortColumnEl = document.getElementById('sortColumn');
-                const sortDirectionEl = document.getElementById('sortDirection');
-
-                if (recordFilterEl) {
-                    recordFilterEl.addEventListener('change', (e) => {
-                        this.recordFilter = e.target.value;
-                        this.renderTable(); // Re-render with new filter
-                    });
-                }
-                if (sortColumnEl) {
-                    sortColumnEl.addEventListener('change', (e) => {
-                        this.currentSortColumn = e.target.value;
-                        this.renderTable(); // Re-render with new sort column
-                    });
-                }
-                if (sortDirectionEl) {
-                    sortDirectionEl.addEventListener('change', (e) => {
-                        this.currentSortDirection = e.target.value;
-                        this.renderTable(); // Re-render with new sort direction
-                    });
-                }
-
-                // NEW: Bind click events for clickable table headers
-                const headers = document.querySelectorAll('th[data-column]');
-                headers.forEach(header => {
-                    header.addEventListener('click', () => {
-                        const column = header.getAttribute('data-column');
-                        const defaultSort = header.getAttribute('data-default-sort') || 'asc';
-                        this.handleHeaderClick(column, defaultSort);
-                    });
                 });
 
                 // Add event listener for exclude columns input
@@ -702,66 +661,29 @@
                 }
             }
 
-            // NEW: Handle click on table header for sorting
-            handleHeaderClick(column, defaultSort) {
-                if (this.currentSortColumn === column) {
-                    // Toggle direction if clicking the same column
-                    this.currentSortDirection = this.currentSortDirection === 'asc' ? 'desc' : 'asc';
-                } else {
-                    // Set new column and use its default sort direction
-                    this.currentSortColumn = column;
-                    this.currentSortDirection = defaultSort;
-                }
-                // Update the sort direction dropdown to reflect the change
-                const sortDirectionEl = document.getElementById('sortDirection');
-                if (sortDirectionEl) {
-                    sortDirectionEl.value = this.currentSortDirection;
-                }
-                // Update the sort column dropdown to reflect the change
-                const sortColumnEl = document.getElementById('sortColumn');
-                if (sortColumnEl) {
-                    sortColumnEl.value = this.currentSortColumn;
-                }
-                // Update the visual sort indicators
-                this.updateSortIndicators();
-                // Re-render the table
-                this.renderTable();
-            },
-
-            // NEW: Update visual sort indicators on headers
-            updateSortIndicators() {
-                // Reset all indicators
-                const indicators = document.querySelectorAll('.sort-indicator');
-                indicators.forEach(ind => {
-                     ind.textContent = '▲▼'; // Neutral indicator
-                     ind.className = 'sort-indicator'; // Reset classes
-                });
-
-                // Set the active indicator
-                const activeIndicator = document.getElementById(`sort-${this.currentSortColumn}`);
-                if (activeIndicator) {
-                    activeIndicator.textContent = this.currentSortDirection === 'asc' ? '▲' : '▼';
-                    activeIndicator.classList.add(this.currentSortDirection); // Add asc or desc class
-                }
-            },
-
             updateExcludedColumnsDisplay() {
                 const excludeColumnsInput = document.getElementById('excludeColumns');
                 const excludedColumnsList = document.getElementById('excludedColumnsList');
+                
                 if (!excludeColumnsInput || !excludedColumnsList) return;
+                
                 const value = excludeColumnsInput.value.trim();
                 const columns = value.split(',').map(col => col.trim().toUpperCase()).filter(col => col);
+                
                 excludedColumnsList.innerHTML = '';
+                
                 if (columns.length === 0) {
                     excludedColumnsList.innerHTML = '<small>No columns excluded</small>';
                     return;
                 }
+                
                 columns.forEach(col => {
                     const label = document.createElement('label');
                     label.innerHTML = `<input type="checkbox" checked> Column ${col}`;
                     excludedColumnsList.appendChild(label);
                 });
             }
+
             showPasswordModal() {
                 const modal = document.getElementById('passwordModal');
                 if (modal) {
@@ -769,6 +691,7 @@
                     document.getElementById('passwordInput').focus();
                 }
             }
+
             hidePasswordModal() {
                 const modal = document.getElementById('passwordModal');
                 if (modal) {
@@ -776,15 +699,19 @@
                     document.getElementById('passwordInput').value = '';
                 }
             }
+
             requestPassword(action) {
                 this.actionAfterAuth = action;
                 this.showPasswordModal();
             }
+
             handlePasswordSubmit() {
                 const passwordInput = document.getElementById('passwordInput');
                 if (!passwordInput) return;
+                
                 if (passwordInput.value === this.password) {
                     this.hidePasswordModal();
+                    
                     switch (this.actionAfterAuth) {
                         case 'config':
                             this.toggleConfiguration();
@@ -793,12 +720,14 @@
                             this.toggleEditMode();
                             break;
                     }
+                    
                     this.actionAfterAuth = null;
                 } else {
                     this.showStatus('Incorrect password', 'error');
                     passwordInput.value = '';
                 }
             }
+
             toggleConfiguration() {
                 const config = document.getElementById('googleSheetsConfig');
                 if (config) {
@@ -806,6 +735,7 @@
                     config.style.display = isVisible ? 'none' : 'block';
                 }
             }
+
             toggleColumnMapping() {
                 const section = document.getElementById('columnMappingSection');
                 if (section) {
@@ -813,48 +743,19 @@
                     section.style.display = isVisible ? 'none' : 'block';
                 }
             }
-            autoLoadDataIfConfigured() {
-                if (this.apiKey && this.spreadsheetId) {
-                    setTimeout(() => {
-                        console.log("Attempting auto-load on startup...");
-                        this.refreshData().catch(err => {
-                             console.error("Auto-load on startup failed:", err);
-                             this.showStatus(`Auto-load failed: ${err.message}`, 'error');
-                        });
-                    }, 500);
-                }
-            }
-            startAutoRefresh() {
-                if (this.autoRefreshInterval) {
-                    clearInterval(this.autoRefreshInterval);
-                }
-                const intervalTime = 24 * 60 * 60 * 1000; // 24 hours
-                // const intervalTime = 5 * 60 * 1000; // 5 minutes for testing
-                this.autoRefreshInterval = setInterval(() => {
-                    console.log("Attempting scheduled auto-refresh...");
-                    if (this.apiKey && this.spreadsheetId) {
-                         this.showStatus('Scheduled auto-refresh started...', 'info');
-                        this.refreshData().catch(err => {
-                            console.error("Scheduled auto-refresh failed:", err);
-                            this.showStatus(`Scheduled auto-refresh failed: ${err.message}`, 'error');
-                        });
-                    } else {
-                        console.log("Scheduled auto-refresh skipped: Configuration missing.");
-                         this.showStatus('Scheduled auto-refresh skipped: Configuration not found.', 'info');
-                    }
-                }, intervalTime);
-                console.log(`Auto-refresh scheduled every ${intervalTime / 1000 / 60 / 60} hours.`);
-            }
+
             saveConfiguration() {
                 const apiKeyEl = document.getElementById('apiKey');
                 const spreadsheetIdEl = document.getElementById('spreadsheetId');
                 const rangeEl = document.getElementById('range');
                 const excludeColumnsEl = document.getElementById('excludeColumns');
+
                 if (apiKeyEl) this.apiKey = apiKeyEl.value.trim();
                 if (spreadsheetIdEl) this.spreadsheetId = spreadsheetIdEl.value.trim();
                 if (rangeEl) this.range = rangeEl.value.trim() || 'Sheet1!A:J';
                 if (excludeColumnsEl) this.excludeColumns = excludeColumnsEl.value.trim();
 
+                // Save column mapping
                 const columnElements = {
                     name: document.getElementById('nameColumn'),
                     date: document.getElementById('dateColumn'),
@@ -863,30 +764,34 @@
                     systolic: document.getElementById('systolicColumn'),
                     scanCount: document.getElementById('scanCountColumn')
                 };
+
                 Object.keys(columnElements).forEach(key => {
                     if (columnElements[key]) {
                         this.columnMapping[key] = columnElements[key].value;
                     }
                 });
 
+                // Save to storage
                 this.setStorageItem('googleSheetsApiKey', this.apiKey);
                 this.setStorageItem('googleSpreadsheetId', this.spreadsheetId);
                 this.setStorageItem('googleSheetsRange', this.range);
                 this.setStorageItem('excludeColumns', this.excludeColumns);
                 this.setStorageItem('columnMapping', JSON.stringify(this.columnMapping));
+
                 this.showStatus('Configuration saved successfully!', 'success');
+                
                 const config = document.getElementById('googleSheetsConfig');
                 if (config) config.style.display = 'none';
-
-                // NEW: Restart auto-refresh timer if config changes
-                this.startAutoRefresh();
             }
+
             async testConnection() {
                 if (!this.apiKey || !this.spreadsheetId) {
                     this.showStatus('Please provide API Key and Spreadsheet ID', 'error');
                     return;
                 }
+
                 this.showStatus('Testing connection...', 'info');
+                
                 try {
                     // Process the range to exclude columns
                     let processedRange;
@@ -896,8 +801,10 @@
                         this.showStatus(`Invalid range format: ${rangeError.message}`, 'error');
                         return;
                     }
+                    
                     const url = `https://sheets.googleapis.com/v4/spreadsheets/${this.spreadsheetId}/values/${encodeURIComponent(processedRange)}?key=${this.apiKey}`;
                     const response = await fetch(url);
+                    
                     if (response.ok) {
                         const data = await response.json();
                         this.showStatus(`Connection successful! Found ${data.values ? data.values.length : 0} rows.`, 'success');
@@ -909,95 +816,93 @@
                     this.showStatus(`Connection failed: ${error.message}`, 'error');
                 }
             }
+
             processRangeWithExclusions(range, excludeColumns) {
-    if (!range) throw new Error('Range cannot be empty');
-    // Parse the range to get sheet name and columns
-    const match = range.match(/^(.*?)!(.+)$/);
-    if (!match) {
-        throw new Error(`Invalid range format: ${range}. Expected format: "SheetName!A:Z" or "SheetName!A,C,D"`);
-    }
-    const sheetName = match[1];
-    let columnsPart = match[2];
-    // If no columns to exclude, return original range
-    if (!excludeColumns || excludeColumns.trim() === '') {
-        return range;
-    }
-    // Parse excluded columns
-    const excludedCols = excludeColumns.split(',')
-        .map(col => col.trim().toUpperCase())
-        .filter(col => col);
-    // For non-contiguous column lists (like A,C,D,E,F,H)
-    if (columnsPart.includes(',')) {
-        const columns = columnsPart.split(',')
-            .map(col => col.trim().toUpperCase())
-            .filter(col => {
-                // Only include columns that:
-                // 1. Are valid column letters (A-Z)
-                // 2. Aren't in the excluded list
-                return /^[A-Z]+$/.test(col) && !excludedCols.includes(col);
-            });
-        if (columns.length === 0) {
-            throw new Error('All columns were excluded - please check your excluded columns list');
-        }
-        return `${sheetName}!${columns.join(',')}`;
-    }
-    // Handle range format (like A:F)
-    const rangeMatch = columnsPart.match(/^([A-Za-z]+):([A-Za-z]+)$/i);
-    if (rangeMatch) {
-        const startCol = rangeMatch[1].toUpperCase();
-        const endCol = rangeMatch[2].toUpperCase();
-        const startIndex = this.columnLetterToIndex(startCol);
-        const endIndex = this.columnLetterToIndex(endCol);
-        const excludedIndices = excludedCols.map(col => this.columnLetterToIndex(col));
-        let includedColumns = [];
-        for (let i = startIndex; i <= endIndex; i++) {
-            if (!excludedIndices.includes(i)) {
-                includedColumns.push(this.indexToColumnLetter(i));
+                if (!excludeColumns || excludeColumns.trim() === '') return range;
+                
+                // Parse the range to get sheet name and columns
+                const match = range.match(/^(.*?)!(.+)$/);
+                if (!match) {
+                    throw new Error(`Invalid range format: ${range}. Expected format: "SheetName!A:Z" or "SheetName!A,C,D"`);
+                }
+                
+                const sheetName = match[1];
+                let columnsPart = match[2];
+                
+                // Parse excluded columns
+                const excludedCols = excludeColumns.split(',')
+                    .map(col => col.trim().toUpperCase())
+                    .filter(col => col);
+                
+                // If it's already a list of columns (like A,C,D,E,F,H)
+                if (columnsPart.includes(',')) {
+                    const columns = columnsPart.split(',')
+                        .map(col => col.trim().toUpperCase())
+                        .filter(col => !excludedCols.includes(col));
+                    
+                    if (columns.length === 0) {
+                        throw new Error('All columns were excluded');
+                    }
+                    
+                    return `${sheetName}!${columns.join(',')}`;
+                }
+                
+                // Handle range format (like A:F)
+                const rangeMatch = columnsPart.match(/^([A-Za-z]+):([A-Za-z]+)$/);
+                if (rangeMatch) {
+                    const startCol = rangeMatch[1].toUpperCase();
+                    const endCol = rangeMatch[2].toUpperCase();
+                    
+                    const startIndex = this.columnLetterToIndex(startCol);
+                    const endIndex = this.columnLetterToIndex(endCol);
+                    
+                    const excludedIndices = excludedCols.map(col => this.columnLetterToIndex(col));
+                    
+                    let includedColumns = [];
+                    for (let i = startIndex; i <= endIndex; i++) {
+                        if (!excludedIndices.includes(i)) {
+                            includedColumns.push(this.indexToColumnLetter(i));
+                        }
+                    }
+                    
+                    if (includedColumns.length === 0) {
+                        throw new Error('All columns were excluded');
+                    }
+                    
+                    if (this.isContiguous(includedColumns)) {
+                        return `${sheetName}!${includedColumns[0]}:${includedColumns[includedColumns.length-1]}`;
+                    } else {
+                        return `${sheetName}!${includedColumns.join(',')}`;
+                    }
+                }
+                
+                // If it's a single column (like A)
+                if (!excludedCols.includes(columnsPart.toUpperCase())) {
+                    return range;
+                }
+                
+                throw new Error('The only column was excluded');
             }
-        }
-        if (includedColumns.length === 0) {
-            throw new Error('All columns in range were excluded');
-        }
-        if (this.isContiguous(includedColumns)) {
-            return `${sheetName}!${includedColumns[0]}:${includedColumns[includedColumns.length-1]}`;
-        } else {
-            return `${sheetName}!${includedColumns.join(',')}`;
-        }
-    }
-    // If it's a single column (like A)
-    if (/^[A-Za-z]+$/.test(columnsPart)) {
-        if (!excludedCols.includes(columnsPart.toUpperCase())) {
-            return range;
-        }
-        throw new Error('The only column was excluded');
-    }
-    throw new Error(`Invalid column specification: ${columnsPart}`);
-}
-// Helper function to check if columns are contiguous
-isContiguous(columns) {
-    for (let i = 1; i < columns.length; i++) {
-        const prevIndex = this.columnLetterToIndex(columns[i-1]);
-        const currIndex = this.columnLetterToIndex(columns[i]);
-        if (currIndex !== prevIndex + 1) {
-            return false;
-        }
-    }
-    return true;
-}
-// Convert column letter to index (A=0, B=1, etc.)
-columnLetterToIndex(letter) {
-    if (!/^[A-Za-z]+$/.test(letter)) {
-        throw new Error(`Invalid column letter: ${letter}`);
-    }
-    return letter.toUpperCase().charCodeAt(0) - 'A'.charCodeAt(0);
-}
-// Convert index to column letter (0=A, 1=B, etc.)
-indexToColumnLetter(index) {
-    if (index < 0 || index > 25) {
-        throw new Error(`Column index out of range: ${index}`);
-    }
-    return String.fromCharCode('A'.charCodeAt(0) + index);
-}
+
+            isContiguous(columns) {
+                for (let i = 1; i < columns.length; i++) {
+                    const prevIndex = this.columnLetterToIndex(columns[i-1]);
+                    const currIndex = this.columnLetterToIndex(columns[i]);
+                    if (currIndex !== prevIndex + 1) {
+                        return false;
+                    }
+                }
+                return true;
+            }
+
+            columnLetterToIndex(letter) {
+                return letter.charCodeAt(0) - 'A'.charCodeAt(0);
+            }
+
+            indexToColumnLetter(index) {
+                return String.fromCharCode('A'.charCodeAt(0) + index);
+            }
+
             async refreshData() {
                 if (!this.apiKey || !this.spreadsheetId) {
                     this.showStatus('Please configure Google Sheets API first', 'error');
@@ -1005,8 +910,10 @@ indexToColumnLetter(index) {
                     if (config) config.style.display = 'block';
                     return;
                 }
+
                 this.showStatus('Loading data from Google Sheets...', 'info');
                 this.showLoading();
+
                 try {
                     // Process the range to exclude columns
                     let processedRange;
@@ -1017,17 +924,22 @@ indexToColumnLetter(index) {
                         this.showError(`Invalid range format. Please check your range (${this.range}) and excluded columns (${this.excludeColumns})`);
                         return;
                     }
+
                     const url = `https://sheets.googleapis.com/v4/spreadsheets/${this.spreadsheetId}/values/${encodeURIComponent(processedRange)}?key=${this.apiKey}`;
                     const response = await fetch(url);
+                    
                     if (!response.ok) {
                         const error = await response.json().catch(() => ({ error: { message: 'Unknown error' } }));
                         throw new Error(error.error?.message || 'Failed to fetch data');
                     }
+
                     const result = await response.json();
                     const rows = result.values || [];
+
                     if (rows.length < 2) {
                         throw new Error('No data found or insufficient data (need at least 1 header row and 1 data row)');
                     }
+
                     // Process data using column mapping
                     try {
                         this.data = rows.slice(1).map(row => ({
@@ -1038,14 +950,18 @@ indexToColumnLetter(index) {
                             avg_systolic: parseFloat(row[this.columnLetterToIndex(this.columnMapping.systolic)]) || 0,
                             scan_count: parseInt(row[this.columnLetterToIndex(this.columnMapping.scanCount)]) || 0
                         }));
+
                         if (this.data.length === 0) {
                             throw new Error('Data loaded but no valid records found. Check your column mapping.');
                         }
+
                         this.renderTable();
                         this.showStatus(`Successfully loaded ${this.data.length} records`, 'success');
+
                     } catch (mappingError) {
                         throw new Error(`Data mapping failed: ${mappingError.message}. Check your column configuration.`);
                     }
+
                 } catch (error) {
                     console.error('Data loading error:', error);
                     this.showStatus(`Error loading data: ${error.message}`, 'error');
@@ -1054,11 +970,13 @@ indexToColumnLetter(index) {
                         1. Your API key and spreadsheet ID<br>
                         2. The sheet name and range are correct<br>
                         3. Your column mapping matches your sheet structure`);
+                    
                     // Show configuration panel to help user fix the issue
                     const config = document.getElementById('googleSheetsConfig');
                     if (config) config.style.display = 'block';
                 }
             }
+
             showLoading() {
                 const tbody = document.getElementById('dataTable');
                 if (tbody) {
@@ -1072,6 +990,7 @@ indexToColumnLetter(index) {
                     `;
                 }
             }
+
             showError(message) {
                 const tbody = document.getElementById('dataTable');
                 if (tbody) {
@@ -1085,6 +1004,7 @@ indexToColumnLetter(index) {
                             </td>
                         </tr>
                     `;
+                    
                     // Add event listener to the new button
                     const showConfigBtn = document.getElementById('showConfigFromError');
                     if (showConfigBtn) {
@@ -1095,9 +1015,11 @@ indexToColumnLetter(index) {
                     }
                 }
             }
+
             renderTable() {
                 const tbody = document.getElementById('dataTable');
                 if (!tbody) return;
+
                 if (!this.data || this.data.length === 0) {
                     tbody.innerHTML = `
                         <tr>
@@ -1109,69 +1031,29 @@ indexToColumnLetter(index) {
                     return;
                 }
 
-                // Work with a copy of the data
-                let displayData = [...this.data];
-
-                // Apply sorting
-                displayData.sort((a, b) => {
-                    let aVal = a[this.currentSortColumn];
-                    let bVal = b[this.currentSortColumn];
-
-                    // Handle date sorting
-                    if (this.currentSortColumn === 'last_scan_date') {
-                         // Convert Excel serial dates if necessary for comparison
-                        if (/^\d+\.\d+$/.test(aVal)) {
-                            const excelDate = parseFloat(aVal);
-                            aVal = new Date((excelDate - 25569) * 86400 * 1000);
-                        } else if (typeof aVal === 'string') {
-                            // Try to parse string dates
-                            const parsedDate = new Date(aVal);
-                            aVal = isNaN(parsedDate) ? aVal : parsedDate;
-                        }
-                        if (/^\d+\.\d+$/.test(bVal)) {
-                            const excelDate = parseFloat(bVal);
-                            bVal = new Date((excelDate - 25569) * 86400 * 1000);
-                        } else if (typeof bVal === 'string') {
-                            const parsedDate = new Date(bVal);
-                            bVal = isNaN(parsedDate) ? bVal : parsedDate;
-                        }
-                    }
-
-                    // Handle string comparisons (case-insensitive)
-                    if (typeof aVal === 'string' && typeof bVal === 'string') {
-                        aVal = aVal.toLowerCase();
-                        bVal = bVal.toLowerCase();
-                    }
-
-                    // Compare values
-                    let comparison = 0;
-                    if (aVal > bVal) {
-                        comparison = 1;
-                    } else if (aVal < bVal) {
-                        comparison = -1;
-                    }
-                    // Apply sort direction
-                    return this.currentSortDirection === 'desc' ? comparison * -1 : comparison;
-                });
-
-                // Apply filtering (Top 10)
-                if (this.recordFilter === 'top10') {
-                    displayData = displayData.slice(0, 10);
-                }
+                // Sort by scan count (descending)
+                const sortedData = [...this.data].sort((a, b) => b.scan_count - a.scan_count);
 
                 let html = '';
-                displayData.forEach((row, index) => {
+                sortedData.forEach((row, index) => {
+                    // Format date (handle both Excel serial dates and regular dates)
                     let formattedDate = row.last_scan_date;
                     if (/^\d+\.\d+$/.test(row.last_scan_date)) {
+                        // Convert Excel serial date to JavaScript date
                         const excelDate = parseFloat(row.last_scan_date);
                         const date = new Date((excelDate - 25569) * 86400 * 1000);
                         formattedDate = date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
                     }
+
+                    // Determine BP status
                     const bpStatus = this.getBPStatus(row.avg_systolic, row.avg_diastolic);
+
+                    // Format name (handle blackout based on namesHidden state)
                     let nameDisplay = row.name;
                     if (this.namesHidden) {
                         nameDisplay = `<span class="blackout">${row.name}</span>`;
                     }
+
                     html += `
                         <tr>
                             <td class="name-cell">${nameDisplay}</td>
@@ -1187,15 +1069,15 @@ indexToColumnLetter(index) {
                         </tr>
                     `;
                 });
-                tbody.innerHTML = html;
 
-                // NEW: Update sort indicators after rendering
-                this.updateSortIndicators();
+                tbody.innerHTML = html;
             }
+
             getBPStatus(systolic, diastolic) {
                 // Determine BP status based on guidelines
                 let systolicStatus = 'normal';
                 let diastolicStatus = 'normal';
+
                 if (systolic >= 140 || diastolic >= 90) {
                     systolicStatus = 'high';
                     diastolicStatus = 'high';
@@ -1205,27 +1087,34 @@ indexToColumnLetter(index) {
                 } else if (systolic >= 120) {
                     systolicStatus = 'elevated';
                 }
+
                 return {
                     systolic: systolicStatus,
                     diastolic: diastolicStatus
                 };
             }
+
             showStatus(message, type) {
                 const statusEl = document.getElementById('statusMessage');
                 if (!statusEl) return;
+
                 statusEl.textContent = message;
                 statusEl.className = `status ${type}`;
                 statusEl.style.display = 'block';
+
                 // Auto-hide after 5 seconds
                 setTimeout(() => {
                     statusEl.style.display = 'none';
                 }, 5000);
             }
+
             toggleEditMode() {
                 this.editMode = !this.editMode;
+                
                 const editButton = document.getElementById('toggleEdit');
                 const namesButton = document.getElementById('toggleNames');
                 const editInfo = document.getElementById('editModeInfo');
+
                 if (this.editMode) {
                     editButton.textContent = '✏️ Exit Edit Mode';
                     editButton.className = 'btn btn-secondary';
@@ -1237,20 +1126,26 @@ indexToColumnLetter(index) {
                     namesButton.style.display = 'none';
                     editInfo.classList.remove('show');
                 }
+
                 this.renderTable();
             }
+
             toggleNames() {
                 this.namesHidden = !this.namesHidden;
                 this.setStorageItem('namesHidden', this.namesHidden.toString());
+                
                 const namesButton = document.getElementById('toggleNames');
+                
                 if (this.namesHidden) {
                     namesButton.textContent = '👁️ Show Names';
                 } else {
                     namesButton.textContent = '👁️ Hide Names';
                 }
+
                 this.renderTable();
             }
         }
+
         // Initialize the app when DOM is loaded
         document.addEventListener('DOMContentLoaded', () => {
             window.sehatScanLeaderboard = new SehatScanLeaderboard();
